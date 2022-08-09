@@ -1,0 +1,12 @@
+
+# IDE/text editor config files.
+/.vscode
+
+# Compiled code
+lib
+bin
+
+# Node/npm modules related folders
+node_modules
+package-lock.json
+

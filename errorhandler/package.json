@@ -1,0 +1,20 @@
+{
+  "name": "@onibi/errorhandler",
+  "version": "1.0.1",
+  "description": "Errorhandler middleware for express.js that catches and transforms HttpError's from the @onibi/errors library.",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "errors"
+  ],
+  "author": "Matthijs Reyers",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/express": "^4.17.13"
+  },
+  "dependencies": {
+    "@onibi/errors": "^0.1.3"
+  }
+}
