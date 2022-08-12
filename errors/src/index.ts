@@ -60,6 +60,33 @@ export abstract class HttpError extends Error implements ApiErrorResponse {
 }
 
 /**
+ * # Http400Error: Bad request.
+ * The Http 400 Unauthorized response status code indicates that the client request was malformed 
+ * in some way and could not be processed because of it.
+ * 
+ * @extends HttpError
+ */
+export class Http400Error extends HttpError {
+    static defaultStatusCode: number = 400;
+    static defaultErrorType: string = '404BadRequest';
+    static defaultTitle: string = 'Bad request';
+    static defaultDescription: string = 'The request could not be processed because it is malformed in some way.';
+
+    constructor(
+        message:string = Http400Error.defaultDescription, 
+        userSafe:boolean = true
+    ) {
+        super(
+            Http400Error.defaultStatusCode, 
+            Http400Error.defaultErrorType, 
+            Http400Error.defaultTitle, 
+            Http400Error.defaultDescription, 
+            message,
+            userSafe
+        );
+    }
+}
+/**
  * # Http401Error: Unauthorized.
  * The Http 401 Unauthorized response status code indicates that the client request has not been 
  * completed because it lacks valid authentication credentials for the requested resource. 

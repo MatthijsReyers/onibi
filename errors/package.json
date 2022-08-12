@@ -1,12 +1,12 @@
 {
   "name": "@onibi/errors",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Standardized error types/responses/handling for express.js based api's and webservers.",
   "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "publish": "tsc; npm publish"
+    "update": "tsc; npm publish"
   },
   "author": "Matthijs Reyers",
   "license": "ISC",
