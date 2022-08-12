@@ -69,7 +69,7 @@ export abstract class HttpError extends Error implements ApiErrorResponse {
 export class Http400Error extends HttpError {
     static defaultStatusCode: number = 400;
     static defaultErrorType: string = '404BadRequest';
-    static defaultTitle: string = 'Bad request';
+    static defaultName: string = 'Bad request';
     static defaultDescription: string = 'The request could not be processed because it is malformed in some way.';
 
     constructor(
@@ -79,7 +79,7 @@ export class Http400Error extends HttpError {
         super(
             Http400Error.defaultStatusCode, 
             Http400Error.defaultErrorType, 
-            Http400Error.defaultTitle, 
+            Http400Error.defaultName, 
             Http400Error.defaultDescription, 
             message,
             userSafe
@@ -136,7 +136,7 @@ export class Http403Error extends HttpError {
 export class Http404Error extends HttpError {
     static defaultStatusCode: number = 404;
     static defaultErrorType: string = '404NotFound';
-    static defaultTitle: string = 'Resource not found';
+    static defaultName: string = 'Resource not found';
     static defaultDescription: string = 'The requested resource could not be found because it was deleted or never existed to begin with.';
 
     constructor(
@@ -146,7 +146,7 @@ export class Http404Error extends HttpError {
         super(
             Http404Error.defaultStatusCode,
             Http404Error.defaultErrorType,
-            Http404Error.defaultTitle,
+            Http404Error.defaultName,
             Http404Error.defaultDescription,
             message,
             isUserSafe
@@ -172,7 +172,7 @@ export class Http404Error extends HttpError {
 export class Http415Error extends HttpError {
     static defaultStatusCode: number = 415;
     static defaultErrorType: string = '415Unsupported';
-    static defaultTitle: string = 'Unsupported media type';
+    static defaultName: string = 'Unsupported media type';
     static defaultDescription: string = 'Request was not completed because the provided media type is not supported.';
 
     constructor(
@@ -182,7 +182,7 @@ export class Http415Error extends HttpError {
         super(
             Http415Error.defaultStatusCode,
             Http415Error.defaultErrorType,
-            Http415Error.defaultTitle,
+            Http415Error.defaultName,
             Http415Error.defaultDescription,
             message,
             isUserSafe
@@ -216,18 +216,19 @@ export class Http415Error extends HttpError {
 export class Http422Error extends HttpError {
     static defaultStatusCode: number = 422;
     static defaultErrorType: string = '422UnprocessableEntity';
-    static defaultTitle: string = 'Unprocessable entity';
+    static defaultName: string = 'Unprocessable entity';
     static defaultDescription: string = 'Request was understood but not completed because its instructions could not be processed.';
 
     constructor(
-        title: string = Http422Error.defaultTitle,
+        errorType: string = Http422Error.defaultErrorType,
+        errorName: string = Http422Error.defaultName,
         message: string = Http422Error.defaultDescription,
-        isUserSafe: boolean = false
+        isUserSafe: boolean = true
     ) {
         super(
             Http422Error.defaultStatusCode,
-            Http422Error.defaultErrorType,
-            title,
+            errorType,
+            errorName,
             Http422Error.defaultDescription,
             message,
             isUserSafe
@@ -239,12 +240,14 @@ export class Http422Error extends HttpError {
      * in the user facing error message.
      * 
      * @param {string} field - Name of the missing field.
+     * @param {boolean} userSafe - Name of the missing field.
      */
-    public static withMissingField(field: string) {
+    public static withMissingField(field: string, userSafe: boolean = true) {
         return new Http422Error(
             '422MissingField',
+            'Missing field',
             `Request is missing the '${field}' field, please provide a value.`,
-            false
+            userSafe
         );
     }
 
@@ -258,6 +261,7 @@ export class Http422Error extends HttpError {
     public static withNegativeField(field: string, userSafe: boolean = true) {
         return new Http422Error(
             '422Negative',
+            'Unexpected negative value',
             `Value for field '${field}' cannot be a negative number.`,
             userSafe
         );
@@ -273,6 +277,7 @@ export class Http422Error extends HttpError {
     public static withNullField(field: string, userSafe: boolean = true) {
         return new Http422Error(
             '422NotNullField',
+            `Unexpected null value`,
             `Field '${field}' cannot be null, please provide a real value.`,
             userSafe
         );
@@ -288,6 +293,7 @@ export class Http422Error extends HttpError {
     public static withNaNField(field: string, value: any, userSafe: boolean = true) {
         return new Http422Error(
             '422NotNumber',
+            'Not a number',
             `Invalid value for field '${field}', value '${value}' is not a number`,
             userSafe
         );
@@ -304,7 +310,7 @@ export class Http422Error extends HttpError {
 export class Http500Error extends HttpError {
     static defaultStatusCode: number = 500;
     static defaultErrorType: string = '500Internal';
-    static defaultTitle: string = 'Internal server error';
+    static defaultName: string = 'Internal server error';
     static defaultDescription: string = 'Request was understood but not completed because its instructions could not be processed.';
     static defaultMessage: string = 'An internal server error took place, please try again later.';
 
@@ -314,7 +320,7 @@ export class Http500Error extends HttpError {
         super(
             Http500Error.defaultStatusCode,
             Http500Error.defaultErrorType,
-            Http500Error.defaultTitle,
+            Http500Error.defaultName,
             Http500Error.defaultDescription,
             message,
             true
@@ -333,7 +339,7 @@ export class Http500Error extends HttpError {
 export class Http501Error extends HttpError {
     static defaultStatusCode: number = 501;
     static defaultErrorType: string = '501NotImplemented';
-    static defaultTitle: string = 'Not implemented';
+    static defaultName: string = 'Not implemented';
     static defaultDescription: string = 'Request was understood but the server does not yet support all the functionality required to fulfill the request.';
     static defaultMessage: string = 'The requested resource is not yet implemented.';
 
@@ -341,7 +347,7 @@ export class Http501Error extends HttpError {
         super(
             Http501Error.defaultStatusCode,
             Http501Error.defaultErrorType,
-            Http501Error.defaultTitle,
+            Http501Error.defaultName,
             Http501Error.defaultDescription,
             message,
             true
