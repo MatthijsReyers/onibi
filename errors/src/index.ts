@@ -222,6 +222,21 @@ export class Http422Error extends HttpError {
     }
 
     /**
+     * Generates a Http422Error with an error message that says the value of the field cannot be a
+     * negative number.
+     * 
+     * @param {string} field - Name of the negative field.
+     * @param {boolean} userSafe - Mark error message as safe to show user.
+     */
+    public static withNegativeField(field: string, userSafe: boolean = true) {
+        return new Http422Error(
+            '422Negative',
+            `Value for field '${field}' cannot be a negative number.`,
+            userSafe
+        );
+    }
+
+    /**
      * Generates a Http422Error with an error message that mentions the name of the field that was 
      * marked as null but cannot be null in the user facing error message.
      * 
