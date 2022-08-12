@@ -1,0 +1,15 @@
+{
+  "name": "@onibi/sanitize",
+  "version": "1.0.0",
+  "description": "Basic input sanitization tools",
+  "main": "./lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "update": "tsc; npm publish"
+  },
+  "author": "Matthijs Reyers",
+  "license": "ISC",
+  "dependencies": {
+    "@onibi/errors": "^0.1.8"
+  }
+}
