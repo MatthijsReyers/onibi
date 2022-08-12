@@ -53,3 +53,8 @@ export function unsignedIntStrict(input:any, fieldName:string, userSafe:boolean 
         
     return value;
 }
+
+export default {
+    unsignedInt,
+    unsignedIntStrict
+};
