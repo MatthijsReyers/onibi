@@ -264,10 +264,11 @@ export class Http500Error extends HttpError {
     static defaultErrorType: string = '500Internal';
     static defaultTitle: string = 'Internal server error';
     static defaultDescription: string = 'Request was understood but not completed because its instructions could not be processed.';
+    static defaultMessage: string = 'An internal server error took place, please try again later.';
 
     native_err: Error;
 
-    constructor(error: Error, message = 'An internal server error took place, please try again later.') {
+    constructor(error: Error, message = Http500Error.defaultMessage) {
         super(
             Http500Error.defaultStatusCode,
             Http500Error.defaultErrorType,
@@ -277,5 +278,31 @@ export class Http500Error extends HttpError {
             true
         );
         this.native_err = error;
+    }
+}
+
+/**
+ * ## Http500Error: Internal server error.
+ * An internal server error has taken place, this is a last resort for when an error occurs 
+ * completely unexpectedly and no more appropriate status code can be found.
+ * 
+ * @extends HttpError
+ */
+export class Http501Error extends HttpError {
+    static defaultStatusCode: number = 501;
+    static defaultErrorType: string = '501NotImplemented';
+    static defaultTitle: string = 'Not implemented';
+    static defaultDescription: string = 'Request was understood but the server does not yet support all the functionality required to fulfill the request.';
+    static defaultMessage: string = 'The requested resource is not yet implemented.';
+
+    constructor(message = Http501Error.defaultMessage) {
+        super(
+            Http501Error.defaultStatusCode,
+            Http501Error.defaultErrorType,
+            Http501Error.defaultTitle,
+            Http501Error.defaultDescription,
+            message,
+            true
+        );
     }
 }
