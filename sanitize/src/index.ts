@@ -2,6 +2,8 @@ import { Http422Error, Http400Error } from '@onibi/errors';
 
 export const UNSIGNED_BASE10_REGEX = /^\d+$/g;
 
+
+
 // export function signedInt(input:any): number {
 //     return 0
 // };
@@ -12,13 +14,12 @@ export const UNSIGNED_BASE10_REGEX = /^\d+$/g;
  * 
  * @param {any} input - User input to sanitize.
  */
-export function unsignedInt(input:any): number
-{
+export function unsignedInt(input: any): number {
     let value: number;
     if (typeof input === 'number')
         value = Math.round(input);
-    else value = parseInt(input || 0);
-    if (isNaN(value) || (value < 0) || !isFinite(value)) 
+    else value = parseInt(input || '0');
+    if (isNaN(value) || (value < 0) || !isFinite(value))
         return 0;
     return value;
 }
@@ -36,21 +37,21 @@ export function unsignedInt(input:any): number
  * @throws {Http400Error} If value is not in base 10.
  * @throws {Http422Error} If the value is null, undefined or negative.
  */
-export function unsignedIntStrict(input:any, fieldName:string, userSafe:boolean = true): number
-{
+export function unsignedIntStrict(input: any, fieldName: string, userSafe: boolean = true): number {
     if (input === null)
-        throw Http422Error.withNullField(fieldName);
+        throw Http422Error.withNullField(fieldName, userSafe);
 
     if (input === undefined)
+        throw Http422Error.withMissingField(fieldName, userSafe);
 
-    if (!input.toString().match(UNSIGNED_BASE10_REGEX))
+    if (!('' + input).match(UNSIGNED_BASE10_REGEX))
         throw new Http400Error(`Expected field '${fieldName}' to a base 10 number.`, userSafe);
 
-    let value = parseInt(input.toString(), 10);
+    let value = parseInt(('' + input), 10);
 
     if (value < 0)
-        throw Http422Error.withNegativeField(fieldName);
-        
+        throw Http422Error.withNegativeField(fieldName, userSafe);
+
     return value;
 }
 

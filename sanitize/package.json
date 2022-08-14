@@ -1,6 +1,6 @@
 {
   "name": "@onibi/sanitize",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Basic input sanitization tools",
   "main": "./lib/index.js",
   "scripts": {
@@ -10,6 +10,6 @@
   "author": "Matthijs Reyers",
   "license": "ISC",
   "dependencies": {
-    "@onibi/errors": "^0.1.8"
+    "@onibi/errors": "^0.1.9"
   }
 }
