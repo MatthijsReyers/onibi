@@ -73,14 +73,14 @@ export class Http400Error extends HttpError {
     static defaultDescription: string = 'The request could not be processed because it is malformed in some way.';
 
     constructor(
-        message:string = Http400Error.defaultDescription, 
-        userSafe:boolean = true
+        message: string = Http400Error.defaultDescription,
+        userSafe: boolean = true
     ) {
         super(
-            Http400Error.defaultStatusCode, 
-            Http400Error.defaultErrorType, 
-            Http400Error.defaultName, 
-            Http400Error.defaultDescription, 
+            Http400Error.defaultStatusCode,
+            Http400Error.defaultErrorType,
+            Http400Error.defaultName,
+            Http400Error.defaultDescription,
             message,
             userSafe
         );
@@ -159,7 +159,7 @@ export class Http404Error extends HttpError {
      * @param {string} resourceName - Type name of the resource.
      */
     static withName(resourceName: string) {
-        return new Http415Error(`Sorry, this ${resourceName} does not exist or was deleted.`, true);
+        return new Http404Error(`Sorry, this ${resourceName} does not exist or was deleted.`, true);
     }
 }
 
