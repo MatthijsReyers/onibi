@@ -1,15 +1,22 @@
 {
   "name": "@onibi/sanitize",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "Basic input sanitization tools",
   "main": "./lib/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha -r ts-node/register ./test/*.test.ts",
     "update": "tsc; npm publish"
   },
   "author": "Matthijs Reyers",
   "license": "ISC",
   "dependencies": {
     "@onibi/errors": "^0.1.9"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.3",
+    "@types/mocha": "^9.1.1",
+    "chai": "^4.3.6",
+    "mocha": "^10.0.0",
+    "ts-node": "^10.9.1"
   }
 }
