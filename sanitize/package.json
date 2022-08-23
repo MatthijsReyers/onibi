@@ -5,7 +5,7 @@
   "main": "./lib/index.js",
   "scripts": {
     "test": "mocha -r ts-node/register ./test/*.test.ts",
-    "update": "tsc; npm publish"
+    "update": "npm run test; tsc; npm publish"
   },
   "author": "Matthijs Reyers",
   "license": "ISC",
