@@ -10,6 +10,10 @@ export interface BuilderOptions {
     /* Defaults to true, when set to true the error handler will send a 404 response when there is no error to catch. Set this
     to false if you wish for middleware/paths after the error handler to be reachable. */
     generate404?: boolean;
+
+    /* Defaults to true, if set to false non http errors will not be logged to the console before being converted to a 
+    Http500Error. */
+    logNonHttpErrors?: boolean;
 };
 
 /**
@@ -23,6 +27,7 @@ export interface BuilderOptions {
 export function errorHandlerBuilder(options?: BuilderOptions) {
     let generate404 = !(options && options['generate404'] === false);
     let includeStackTrace = (options && options['includeStackTrace'] === true);
+    let logNonHttpErrors = ((!options) || options['logNonHttpErrors'] !== false);
 
     if (includeStackTrace && process.env['NODE_ENV'] === 'production') {
         console.warn(`WARNING: Overwriting 'includeStackTrace' to false because NODE_ENV was set to 'production', what are you doing?`);
@@ -32,34 +37,37 @@ export function errorHandlerBuilder(options?: BuilderOptions) {
         console.warn(`WARNING: 'includeStackTrace' is set to true, this is not a production environment right?`)
     }
 
-    return (error: Error, req: Request, res: Response, next: Function) => {
+    return [
+        (req: Request, res: Response, next: Function) => {
+                if (generate404) {
+                    next(new Http404Error(`Sorry, the path "${req.url}" does not exist.`, false));
+                } else {
+                    return next();
+                }
+        },
+        (error: Error, req: Request, res: Response, next: Function) => {
 
-        if (!error) {
-            if (generate404) {
-                error = new Http404Error(`Sorry, the path "${req.url}" does not exist.`, false);
-            } else {
-                return next();
+            if (!(error instanceof HttpError)) {
+                if (logNonHttpErrors) {
+                    console.error(error);
+                    console.error(error.stack);
+                }
+                error = new Http500Error(error);
             }
+
+            let httpError: HttpError = <HttpError>error;
+
+            res.status(httpError.statusCode);
+
+            let body: ApiErrorResponse = httpError.toJSON();
+            if (includeStackTrace)
+                body.stackTrace = error.stack;
+
+            res.json(body);
+
+            res.end();
         }
-
-        if (!(error instanceof HttpError)) {
-            console.error(error);
-            console.error(error.stack);
-            error = new Http500Error(error);
-        }
-
-        let httpError: HttpError = <HttpError>error;
-
-        res.status(httpError.statusCode);
-
-        let body: ApiErrorResponse = httpError.toJSON();
-        if (includeStackTrace)
-            body.stackTrace = error.stack;
-
-        res.json(body);
-
-        res.end();
-    };
+    ];
 }
 
 export default errorHandlerBuilder;
