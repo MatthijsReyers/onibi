@@ -42,7 +42,7 @@ export abstract class HttpError extends Error implements ApiErrorResponse {
         this.statusCode = statusCode;
         this.errorType = errorType;
         this.errorName = errorName;
-        this.description = message;
+        this.description = description;
         this.message = message;
         this.isUserSafe = isUserSafe;
     }
