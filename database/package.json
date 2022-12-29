@@ -1,0 +1,32 @@
+{
+  "name": "@onibi/database",
+  "version": "0.0.1",
+  "description": "Generic database wrapper around SQL database connectors",
+  "main": "lib/index.js",
+  "exports": {
+    "mysql": "./lib/mysql-connector/index.js",
+    "sqlite3": "./lib/sqlite3-connector/index.js"
+  },
+  "scripts": {
+    "test": "mocha -r ts-node/register ./test/*.test.ts",
+    "build": "tsc",
+    "update": "tsc; npm publish"
+  },
+  "keywords": [
+    "database",
+    "sql"
+  ],
+  "author": "Matthijs Reyers",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/chai": "^4.3.3",
+    "@types/mocha": "^9.1.1",
+    "@types/mysql": "^2.15.21",
+    "chai": "^4.3.6",
+    "mocha": "^10.0.0",
+    "ts-node": "^10.9.1"
+  },
+  "dependencies": {
+    "mysql": "^2.18.1"
+  }
+}
