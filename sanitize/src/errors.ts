@@ -43,7 +43,6 @@ export class UnexpectedValueError extends SanitizerError
     }
 }
 
-
 export class NullValueError extends SanitizerError
 {
     private field: string | null;

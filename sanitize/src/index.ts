@@ -1,14 +1,14 @@
 
-import { signedInt, unsignedInt } from './integer';
-import { bool, setBoolRules } from './boolean';
-import strict from './strict';
+import int from './integer';
+import bool from './boolean';
+import enumeration from './enumeration';
+
 import decorators from './decorators';
 
 export default {
-    signedInt,
-    unsignedInt,
+    int,
     bool,
-    setBoolRules,
-    strict,
+    enumeration,
+
     decorators
 };

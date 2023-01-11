@@ -1,134 +1,206 @@
 
-// import sanitize from './../src/index';
-// import { Http422Error } from '@onibi/errors';
+import sanitize from './../src/index';
 
-// import { expect } from 'chai';
-// import 'mocha';
-// import { randomFloat, randomInt } from './random';
+import { expect } from 'chai';
+import 'mocha';
+import { NegativeValueError } from '../src/errors';
 
-// describe('Unsigned integers', () => {
+describe('Unsigned integers', () => {
+    it('should replace negative values with custom ones', () => {
+        let result: number;
 
-//     it('should deal with null values', () => {
-//         let result: number;
+        result = sanitize.int.unsigned(-82390, { signedValues: 66 });
+        expect(result).to.equal(66);
 
-//         expect(() => {
-//             sanitize.strict.unsignedInt(null, 'unit test');
-//         }).to.throw(Http422Error, 'unit test');
+        result = sanitize.int.unsigned(-34921);
+        expect(result).to.equal(0);
 
-//         result = sanitize.unsignedInt(null);
-//         expect(result).to.equal(0);
+        result = sanitize.int.unsigned(-34921, { default: 90, signedValues: 77 });
+        expect(result).to.equal(77);
 
-//         for (let i = 0; i < 15; i++) {
-//             result = sanitize.unsignedInt(null, i);
-//             expect(result).to.equal(i);
-//         }
-//     });
+        sanitize.int.setRules({ default: 90, signedValues: 420 });
 
-//     it('should deal with undefined values', () => {
-//         let result: number;
+        result = sanitize.int.unsigned(-6327);
+        expect(result).to.equal(420);
 
-//         expect(() => {
-//             sanitize.strict.unsignedInt(undefined, 'unit test');
-//         }).to.throw(Http422Error, 'unit test');
+        sanitize.int.setRules({ default: 0, signedValues: 0 });
 
-//         result = sanitize.unsignedInt(undefined);
-//         expect(result).to.equal(0);
+        result = sanitize.int.unsigned(-98391234);
+        expect(result).to.equal(0);
+    });
 
-//         for (let i = 0; i < 15; i++) {
-//             result = sanitize.unsignedInt(undefined, i);
-//             expect(result).to.equal(i);
-//         }
-//     });
+    it('should make negative values absolute', () => {
+        let result: number;
 
-//     it('should deal with NaN values', () => {
-//         let result: number;
+        result = sanitize.int.unsigned(-78, { signedValues: 'abs' });
+        expect(result).to.equal(78);
 
-//         expect(() => {
-//             sanitize.strict.unsignedInt(NaN, 'unit test');
-//         }).to.throw(Http422Error, 'unit test');
+        result = sanitize.int.unsigned(-34921);
+        expect(result).to.equal(0);
 
-//         result = sanitize.unsignedInt(NaN);
-//         expect(result).to.equal(0);
+        result = sanitize.int.unsigned(-34921, { signedValues: 'abs' });
+        expect(result).to.equal(34921);
 
-//         for (let i = 0; i < 15; i++) {
-//             result = sanitize.unsignedInt(NaN, i);
-//             expect(result).to.equal(i);
-//         }
-//     });
+        sanitize.int.setRules({ signedValues: 'abs' });
 
-//     it('should deal with positive float values', () => {
-//         let result: number;
+        result = sanitize.int.unsigned(-6327);
+        expect(result).to.equal(6327);
 
-//         for (let i = 0; i < 15; i++) {
-//             let value = randomFloat(0, 99999999);
+        sanitize.int.setRules({ signedValues: 0 });
 
-//             expect(() => {
-//                 sanitize.strict.unsignedInt(value, 'unit test');
-//             }).to.throw(Http422Error, 'unit test');
-    
-//             result = sanitize.unsignedInt(value, -1);
-//             expect(result).to.equal(i);
-//         }
-//     });
+        result = sanitize.int.unsigned(-98391234);
+        expect(result).to.equal(0);
+    });
 
-//     it('should deal with negative float values', () => {
-//         let result: number;
+    it('should replace negative values with the default one', () => {
+        let result: number;
 
-//         for (let i = 0; i < 15; i++) {
-//             let value = randomFloat(-99999999, 0);
+        result = sanitize.int.unsigned(-82390, { signedValues: 'default' });
+        expect(result).to.equal(0);
 
-//             expect(() => {
-//                 sanitize.strict.unsignedInt(value, 'unit test');
-//             }).to.throw(Http422Error, 'unit test');
-    
-//             result = sanitize.unsignedInt(value);
-//             expect(result).to.equal(0);
-//         }
-//     });
+        result = sanitize.int.unsigned(-8);
+        expect(result).to.equal(0);
 
-//     it('should deal with negative values', () => {
-//         for (let i = 0; i < 300; i++) {
-//             let input: number = randomInt(-999999, -100);
+        result = sanitize.int.unsigned(-323, { default: 90, signedValues: 'default' });
+        expect(result).to.equal(90);
 
-//             expect(() => {
-//                 sanitize.strict.unsignedInt(input, 'unit test');
-//             }).to.throw(Http422Error, 'unit test');
+        sanitize.int.setRules({ default: 69, signedValues: 'default' });
 
-//             let result = sanitize.unsignedInt(input);
-//             expect(result).to.equal(0);
-//         }
-//     });
+        result = sanitize.int.unsigned(-420);
+        expect(result).to.equal(69);
 
+        result = sanitize.int.unsigned(-420, { default: 7823 });
+        expect(result).to.equal(7823);
 
-//     it('should deal with positive values', () => {
-//         let result: number;
+        sanitize.int.setRules({ default: 0, signedValues: 0 });
 
-//         for (let i = 0; i < 15; i++) {
-//             let value = randomInt(0, 99999999);
-//             result = sanitize.strict.unsignedInt(value, 'unit test');
-//             expect(result).to.equal(value);
+        result = sanitize.int.unsigned(-98391234);
+        expect(result).to.equal(0);
+    });
 
-//             result = sanitize.unsignedInt(value, -1);
-//             expect(result).to.equal(value);
-//         }
+    it('should throw an error for negative values', () => {
+        let result: number;
 
-//         for (let i = 0; i < 300; i++) {
-//             let input: number = randomInt(0, 999999999);
+        expect(() => {
+            sanitize.int.unsigned(-78, { signedValues: 'error' });
+        }).to.throw(NegativeValueError, 'negative');
 
-//             result = sanitize.strict.unsignedInt(input, 'unit test');
-//             expect(result).to.equal(input);
+        result = sanitize.int.unsigned(-34921);
+        expect(result).to.equal(0);
 
-//             result = sanitize.unsignedInt(input);
-//             expect(result).to.equal(input);
+        sanitize.int.setRules({ signedValues: 'error' });
 
-//             result = sanitize.unsignedInt('  ' + input);
-//             expect(result).to.equal(input);
+        expect(() => {
+            sanitize.int.unsigned(-666);
+        }).to.throw(NegativeValueError, 'negative');
 
-//             result = sanitize.unsignedInt(input + 0.0);
-//             expect(result).to.equal(input);
+        sanitize.int.setRules({ signedValues: 0 });
 
-//             result = sanitize.unsignedInt('' + input + '.000\t');
-//             expect(result).to.equal(input);
-//         }
-//     });
-// });
+        result = sanitize.int.unsigned(-777);
+        expect(result).to.equal(0);
+
+        expect(() => {
+            sanitize.int.unsigned(-235432236, {
+                default: 'error', signedValues: 'default' 
+            });
+        }).to.throw(NegativeValueError, 'negative');
+
+        result = sanitize.int.unsigned(-32);
+        expect(result).to.equal(0);
+
+        sanitize.int.setRules({ default: 'error', signedValues: 'default'});
+
+        expect(() => {
+            sanitize.int.unsigned(-235432236);
+        }).to.throw(NegativeValueError, 'negative');
+
+        sanitize.int.setRules({ default: 0, signedValues: 0 });
+    });
+
+    it('should throw an error with field name for negative values', () => {
+        let result: number;
+
+        expect(() => {
+            sanitize.int.unsigned(-3920, { signedValues: 'error' }, 'WACKY');
+        }).to.throw(NegativeValueError, 'WACKY');
+
+        result = sanitize.int.unsigned(-1);
+        expect(result).to.equal(0);
+
+        sanitize.int.setRules({ signedValues: 'error' });
+
+        expect(() => {
+            sanitize.int.unsigned(-22, {}, 'QUACKY');
+        }).to.throw(NegativeValueError, 'negative');
+
+        sanitize.int.setRules({ signedValues: 0 });
+
+        result = sanitize.int.unsigned(-555, {}, 'TACKY');
+        expect(result).to.equal(0);
+
+        expect(() => {
+            sanitize.int.unsigned(-908, {
+                default: 'error', signedValues: 'default' 
+            }, 'LACKY');
+        }).to.throw(NegativeValueError, 'negative');
+
+        result = sanitize.int.unsigned(-32, {}, 'MACKY');
+        expect(result).to.equal(0);
+
+        sanitize.int.setRules({ default: 'error', signedValues: 'default'});
+
+        expect(() => {
+            sanitize.int.unsigned(-233, {}, 'YACKY');
+        }).to.throw(NegativeValueError, 'YACKY');
+
+        sanitize.int.setRules({ default: 0, signedValues: 0 });
+    });
+});
+
+describe('Ranged integers', () => {
+    it('should clamp out of range values within the range', () => {
+        let result: number;
+
+        result = sanitize.int.ranged(-20, -10, 10);
+        expect(result).to.equal(-10);
+
+        result = sanitize.int.ranged(1000, 832, 999);
+        expect(result).to.equal(999);
+
+        result = sanitize.int.ranged(831, 832, 999);
+        expect(result).to.equal(832);
+
+        result = sanitize.int.ranged(89, -89, 73, { outOfRangeValues: 'clamp' });
+        expect(result).to.equal(73);
+
+        sanitize.int.setRules({ outOfRangeValues: 666 });
+
+        result = sanitize.int.ranged(203, -100, 100, { outOfRangeValues: 'clamp' });
+        expect(result).to.equal(100);
+
+        sanitize.int.setRules({ outOfRangeValues: 'clamp' });
+    });
+
+    it('should replace out of range values within custom ones', () => {
+        let result: number;
+
+        // result = sanitize.int.ranged(-20, -10, 10);
+        // expect(result).to.equal(-10);
+
+        // result = sanitize.int.ranged(1000, 832, 999);
+        // expect(result).to.equal(999);
+
+        // result = sanitize.int.ranged(831, 832, 999);
+        // expect(result).to.equal(832);
+
+        // result = sanitize.int.ranged(89, -89, 73, { outOfRangeValues: 'clamp' });
+        // expect(result).to.equal(73);
+
+        // sanitize.int.setRules({ outOfRangeValues: 666 });
+
+        // result = sanitize.int.ranged(203, -100, 100, { outOfRangeValues: 'clamp' });
+        // expect(result).to.equal(100);
+
+        // sanitize.int.setRules({ outOfRangeValues: 'clamp' });
+    });
+});
