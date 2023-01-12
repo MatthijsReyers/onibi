@@ -19,7 +19,11 @@ function getRule<T>(ruleKey: keyof EmailSanitizerRules, rules?: Partial<EmailSan
     return <T>(<any>globalRules)[ruleKey];
 }
 
-function check(regex: RegExp, input: any, rules?: EmailSanitizerRules, field?: string) {
+/**
+ * Checks if the given error matches and performs the default case if not.
+ */
+function check(regex: RegExp, input: any, rules?: EmailSanitizerRules, field?: string) 
+{
     input = (input+'').trim()
     if (input.match(regex)) 
         return input;
