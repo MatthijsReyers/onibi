@@ -18,6 +18,27 @@ export class SanitizerError extends Error
     }
 }
 
+export class InvalidEmailError extends SanitizerError
+{
+    private field?: string;
+    private value?: string;
+
+    constructor(value: string, field?: string) 
+    {
+        if (field)
+            super(`Invalid Email Address`, `Received value '${value}' for field '${field}' was not a valid email address.`);
+        super(`Invalid Email Address`, `Received value '${value}' was not a valid email address.`);
+        this.field = field;
+        this.value = value;
+    }
+
+    public override toHttpError() 
+    {
+        // TODO !!!!!!!!!!!!!!!!!!!!!!!!!
+        return new Http422Error('422InvalidEmail', 'Invalid Email Address', 'Provided string was not an email.');
+    }
+}
+
 export class UnexpectedValueError extends SanitizerError
 {
     private field?: string;
