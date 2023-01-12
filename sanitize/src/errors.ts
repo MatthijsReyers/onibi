@@ -62,6 +62,25 @@ export class NullValueError extends SanitizerError
     }
 }
 
+export class InfiniteValueError extends SanitizerError
+{
+    private field: string | null;
+
+    constructor(field?: string) 
+    {
+        if (field) super(`Infinite value`, `Field '${field}' cannot be infinite.`);
+        else super(`Infinite value`, `Value must be finite.`)
+        this.field = field || null;
+    }
+
+    public override toHttpError() 
+    {
+        if (this.field)
+            return Http422Error.withNegativeField(this.field);
+        return new Http422Error('422InfiniteValue', 'Infinite value', 'Expected a finite value.');
+    }
+}
+
 export class NegativeValueError extends SanitizerError
 {
     private field: string | null;

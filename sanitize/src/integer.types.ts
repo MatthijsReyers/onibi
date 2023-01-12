@@ -20,9 +20,17 @@ export interface IntegerSanitizerRules
     /**
      * How should NaN values be treated. When this options is set 'default' any NaN input will be
      * converted into the default value instead, and when set to 'error' a NaNValueError will be 
-     * throw.
+     * throw. NaN values can also be explicity allowed in which case any NaN input will result in
+     * NaN being returned.
      */
-    nanValues: boolean | 'default' | 'error';
+    nanValues: number | 'default' | 'allow' | 'error';
+
+    /**
+     * How should positive and negative infinity should be treated. When this options is set to
+     * 'clamp' values will be clamped to MAX_SAFE_INTEGER and MIN_SAFE_INTEGER respectively.
+     * When set to 'error' an InfiniteValueError will be throw.
+     */
+    infiniteValues: number | 'clamp' | 'default' | 'error';
 
     /**
      * How should 'undefined' values be treated? When this options is set 'default' any undefined 

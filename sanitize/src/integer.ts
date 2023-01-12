@@ -1,9 +1,35 @@
-import { NegativeValueError } from "./errors";
+import { NanValueError, NegativeValueError, NullValueError, UnexpectedValueError } from "./errors";
 import { ExtendedIntSanitizerRules, IntegerSanitizerRules, RangedIntSanitizerRules, 
          RuleKey, UnsignedIntSanitizerRules } from "./integer.types";
 
 const SIGNED_REGEX = /^(\s*)((((-(\s*))?)(\d+))|(0x([0-9a-fA-F]+)))(\s*)$/;
 const UNSIGNED_REGEX = /^(\s*)((\d+)|(0x([0-9a-fA-F]+)))(\s*)$/;
+
+/**
+ * Application wide integer sanitizer behavior.
+ */
+var globalRules: ExtendedIntSanitizerRules = {
+    default:         0,
+    nullValues:      'default',
+    nanValues:       'default',
+    undefinedValues: 'default',
+    infiniteValues:  'clamp',
+    trimStrings:     true,
+    strictStrings:   false,
+
+    outOfRangeValues: 'clamp',
+    signedValues:     0,
+}
+
+/**
+ * Gets a value from the global rules or the locally provided rules if given.
+ */
+function getRule<T>(ruleKey: RuleKey, rules?: Partial<ExtendedIntSanitizerRules>): T 
+{
+    if (rules && rules.hasOwnProperty(ruleKey) && ruleKey in rules)
+        return <T>(<any>rules)[ruleKey];
+    return <T>(<any>globalRules)[ruleKey];
+}
 
 /**
  * Flexible sanitizer for signed integers, will never throw an error and convert any invalid or 
@@ -17,8 +43,39 @@ const UNSIGNED_REGEX = /^(\s*)((\d+)|(0x([0-9a-fA-F]+)))(\s*)$/;
  */
 function int(input: any, rules?: Partial<IntegerSanitizerRules>, field?: string): number
 {
-    // TODO
-    return parseInt(input);
+    if (typeof input === 'string') {
+        if (getRule<boolean>('trimStrings')) {
+            input = input.trim()
+        }
+        input = parseInt(input);
+        // TODO: String stuff..
+    }
+    if (typeof input === 'number') {
+        if (Number.isNaN(input)) {
+            let rule = getRule<number | 'default' | 'allow' | 'error'>('nanValues', rules);
+            if (rule === 'allow')
+                return NaN;
+            let defaultValue = getRule<number | 'error'>('default', rules);
+            if (rule === 'error' || defaultValue === 'error')
+                throw new NanValueError(field);
+            if (rule === 'default')
+                return defaultValue;
+            return rule;
+        }
+        input = Math.round(input);
+        if (!isFinite(input)) {
+            let rule = getRule<number | 'default' | 'clamp' | 'error'>('infiniteValues', rules);
+            if (rule === 'clamp') {
+                if (input === Number.POSITIVE_INFINITY) return Number.MAX_SAFE_INTEGER;
+                return Number.MIN_SAFE_INTEGER;
+            }
+        }
+        return input;
+    }
+    let defaultValue = getRule<number | 'error'>('default', rules);
+    if (defaultValue === 'error')
+        throw new UnexpectedValueError(field);
+    return defaultValue;
 }
 
 namespace int 
@@ -78,21 +135,6 @@ namespace int
     }
 
     /**
-     * Application wide integer sanitizer behavior.
-     */
-    var globalRules: ExtendedIntSanitizerRules = {
-        default: 0,
-        nullValues: 'default',
-        nanValues: 'default',
-        undefinedValues: 'default',
-        trimStrings:  true,
-        strictStrings: false,
-
-        outOfRangeValues: 'clamp',
-        signedValues: 0,
-    }
-
-    /**
      * Set application wide rules for boolean sanitizer. Note that not all options have to be provided
      * and default or previously set values will be kept if a new value is not included.
      */
@@ -109,16 +151,6 @@ namespace int
                 }
             }
         }
-    }
-
-    /**
-     * Gets a value from the global rules or the locally provided rules if given.
-     */
-    function getRule<T>(ruleKey: RuleKey, rules?: Partial<ExtendedIntSanitizerRules>): T 
-    {
-        if (rules && rules.hasOwnProperty(ruleKey) && ruleKey in rules)
-            return <T>(<any>rules)[ruleKey];
-        return <T>(<any>globalRules)[ruleKey];
     }
 }
 
