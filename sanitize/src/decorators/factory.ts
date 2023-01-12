@@ -8,7 +8,7 @@
  * @param {Function} check: Checking 
  * @returns {Function} decorator
  */
-export function decoratorFactory(check:(val:any, key:string) => void)
+export function decoratorFactory(check:(val:any, key:string) => any)
 {
     return (target: object, propertyKey: string|symbol) => {
         // Value variable, this will actually store the variable if the old 
@@ -31,8 +31,7 @@ export function decoratorFactory(check:(val:any, key:string) => void)
                     enumerable: true,
                     get: () => oldGetter(),
                     set: (newValue: number) => {
-                        check(newValue, String(propertyKey));
-                        oldSetter(newValue);
+                        oldSetter(check(newValue, String(propertyKey)));
                     }
                 }
             );
@@ -47,8 +46,7 @@ export function decoratorFactory(check:(val:any, key:string) => void)
                 enumerable: true,
                 get: () => value,
                 set: (newValue: number) => {
-                    check(newValue, String(propertyKey));
-                    value = newValue;
+                    value = check(newValue, String(propertyKey));
                 }
             }
         );
