@@ -24,7 +24,7 @@ function getRule<T>(ruleKey: keyof EmailSanitizerRules, rules?: Partial<EmailSan
  */
 function check(regex: RegExp, input: any, rules?: EmailSanitizerRules, field?: string) 
 {
-    input = (input+'').trim()
+    input = (input+'').trim().toLocaleLowerCase()
     if (input.match(regex)) 
         return input;
     const defaultValue = getRule<string | 'error'>('default', rules);
