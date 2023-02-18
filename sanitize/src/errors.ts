@@ -64,6 +64,25 @@ export class UnexpectedValueError extends SanitizerError
     }
 }
 
+export class EnumValueError extends SanitizerError
+{
+    private field: string | null;
+
+    constructor(values: any[], value: any, field?: string) 
+    {
+        if (field) super(`Enum value`, `Field '${field}' has unexpected value '${value}', but expected one of [${values}].`);
+        else super(`Enum value`, `Found unexpected value '${value}', but expected one of [${values}].`);
+        this.field = field || null;
+    }
+
+    public override toHttpError() 
+    {
+        if (this.field)
+            return Http422Error.withNullField(this.field);
+        return new Http422Error('422NullValue', 'Null value', 'Unexpected null value.');
+    }
+}
+
 export class NullValueError extends SanitizerError
 {
     private field: string | null;
