@@ -1,7 +1,8 @@
 {
   "name": "@onibi/sanitize",
   "version": "2.0.1",
-  "description": "Basic input sanitization tools",
+  "description": "Basic input validation tools with rich error messages.",
+  "homepage": "https://github.com/MatthijsReyers/onibi/tree/main/sanitize",
   "main": "./lib/index.js",
   "scripts": {
     "test": "mocha -r ts-node/register ./test/*.test.ts",
