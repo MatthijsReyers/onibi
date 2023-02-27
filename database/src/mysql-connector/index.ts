@@ -1,38 +1,89 @@
-import '../../database/src/connector';
-import { DatabaseConnection } from '@onibi/database';
+import { DatabaseConnector, DatabaseTransaction } from './../connector';
 import mysql from 'mysql';
 
-export class MySqlConnection implements DatabaseConnection {
+export class MySqlConnector implements DatabaseConnector 
+{
+    static connectionType: string = "MySQL";
 
+    private connectionPool?: mysql.Pool;
+
+    constructor()
+    {
+        mysql.createPool({
+
+        })
+    }
+
+    public query(statement: string, params: any[]): Promise<any>
+    {
+        return new Promise((resolve, reject) => {
+
+        });
+    }
+
+    public beginTransaction(): Promise<DatabaseTransaction>
+    {
+        return new Promise((resolve, reject) => {
+            return
+        });
+    }
+}
+
+export class MySqlTransaction implements DatabaseTransaction 
+{
     private _conn: mysql.PoolConnection;
 
-    constructor(conn: mysql.PoolConnection) {
+    constructor(conn: mysql.PoolConnection) 
+    {
         this._conn = conn;
     }
 
-    public async query<Type = void>(statement: string, params: any[] = []): Promise<Type> {
-        return new Promise<Type>((resolve, reject) => {
-            this._conn.query(statement, params, (err, res) => {
+    public query<T>(statement: string, params?: any[], timeout?: number): Promise<T> 
+    {
+        return new Promise<T>((resolve, reject) => {
+            this._conn.query({
+                sql: statement,
+                values: params,
+                timeout: timeout
+            }, (err, res) => {
                 if (err) reject(err);
-                resolve(res);
+                resolve(<T>res);
             })
         });
     }
 
-    /**
-     * Close the connection. Any queued data (eg queries) will be sent first. If
-     * there are any fatal errors, the connection will be immediately closed.
-     * @param callback Handler for any fatal error
-     */
-    public end(): void {
-        this._conn.end();
+    public commit(): Promise<void> 
+    {
+        return new Promise<void>((resolve, reject) => {
+            this._conn.commit((err?: mysql.MysqlError) => {
+                if (err) reject(err);
+                resolve();
+            });
+        });
     }
 
-    /**
-     * Close the connection immediately, without waiting for any queued data (eg
-     * queries) to be sent. No further events or callbacks will be triggered.
-     */
-    public destroy(): void {
+    public rollback(): Promise<void> 
+    {
+        return new Promise<void>((resolve, reject) => {
+            this._conn.rollback((err?: mysql.MysqlError) => {
+                if (err) reject(err);
+                resolve();
+            });
+        });
+    }
+
+    public close(): Promise<void> 
+    {
+        return new Promise<void>((resolve, reject) => {
+            (<any>this._conn.end)((err?: mysql.MysqlError) => {
+                if (err) reject(err);
+                resolve();
+            });
+        });
+    }
+
+    public async destroy(): Promise<void> 
+    {
         this._conn.destroy();
     }
 }

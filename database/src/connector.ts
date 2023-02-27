@@ -1,6 +1,9 @@
 
-export abstract class DatabaseConnector {
-
+/**
+ * 
+ */
+export abstract class DatabaseConnector 
+{
     /**
      * String representing SQL database type that this connector connects with.
      * For example "MySQL", "SQLite3", "PostgreSQL", reference the documentation for the specific 
@@ -9,26 +12,26 @@ export abstract class DatabaseConnector {
     static connectionType: string;
 
     /**
-     * Executes a query without regard
+     * Executes a query without any regard for transactions and multithreading. Only use this 
+     * function for singular queries that cannot cause race conditions
      */
-    public abstract query<T>(statement: string, params: any[]): T;
-    public abstract query(statement: string, params: any[]): any;
+    public abstract query(statement: string, params: any[]): Promise<any>;
 
     public abstract beginTransaction(): Promise<DatabaseTransaction>;
 }
 
 /**
- * Represents a single transaction.
+ * Represents a single SQL transaction made up of one or more queries.
  */
-export abstract class DatabaseTransaction {
-
+export abstract class DatabaseTransaction 
+{
     /**
      * 
-     * @param statement 
-     * @param params 
-     * @param timeout
+     * @param {string} statement - SQL statement to execute.
+     * @param {any[]} params - Parameters to fill into the SQL statement.
+     * @param {number} timeout - The maximum time the query may take to execute.
      */
-    public abstract query<T = any>(statement: string, params: any[], timeout: number): T;
+    public abstract query(statement: string, params?: any[], timeout?: number): Promise<any>;
 
     /** 
      * Commits the given transaction to the database.
