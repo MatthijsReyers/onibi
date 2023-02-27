@@ -5,7 +5,12 @@
 export interface EmailSanitizerRules 
 {
     /**
-     * Set to error
+     * Set to error by default.
      */
     default: string | 'error';
+
+    /**
+     * Set to true by default.
+     */
+    trimStrings: boolean;
 }
