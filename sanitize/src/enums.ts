@@ -40,7 +40,7 @@ function getRule<T>(ruleKey: RuleKey, rules?: Partial<EnumSanitizerRules>): T
 function enums<T>(input: any, values: T[], rules?: Partial<EnumSanitizerRules>, field?: string)
 {
     if (input === null) {
-        if (getRule('allowNull', rules) === true || values.includes(<T>null)) {
+        if (getRule('allowNull', rules) === true || values.includes(<any>null)) {
             return null;
         } else if  (getRule('default', rules) === undefined) {
             throw new NullValueError(field);

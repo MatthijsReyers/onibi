@@ -59,8 +59,11 @@ export class UnexpectedValueError extends SanitizerError
 
     public override toHttpError() 
     {
-        // TODO !!!!!!!!!!!!!!!!!!!!!!!!!
-        return new Http422Error('422NullValue', 'Null value', 'Unexpected null value.');
+        if (this.value)
+            return new Http422Error('422UnexpectedValue', 'Unexpected value', `Received unexpected value '${this.value}' for field '${this.field}'.`);
+        if (this.field)
+            return new Http422Error('422UnexpectedValue', 'Unexpected value', `Received unexpected value for field: '${this.field}'.`);
+        return new Http422Error('422UnexpectedValue', 'Unexpected value', 'Received unexpected value.');
     }
 }
 
@@ -79,7 +82,7 @@ export class EnumValueError extends SanitizerError
     {
         if (this.field)
             return Http422Error.withNullField(this.field);
-        return new Http422Error('422NullValue', 'Null value', 'Unexpected null value.');
+        return new Http422Error('422EnumValue', 'Enum value', `Unexpected value for field '${this.field}'.`);
     }
 }
 

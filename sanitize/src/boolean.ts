@@ -22,8 +22,8 @@ var globalRules: BooleanSanitizerRules = {
 function getRule<T>(ruleKey: RuleKey, rules?: Partial<BooleanSanitizerRules>): T 
 {
     if (rules && rules.hasOwnProperty(ruleKey))
-        return <T>rules[ruleKey];
-    return <T>globalRules[ruleKey];
+        return <T>(<any>rules)[ruleKey];
+    return <T>(<any>globalRules)[ruleKey];
 }
 
 /**
