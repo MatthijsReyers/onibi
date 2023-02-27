@@ -1,0 +1,15 @@
+{
+  "name": "chat",
+  "version": "1.0.0",
+  "description": "chatter",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "mocha -r ts-node/register ./test/*.test.ts"
+  },
+  "author": "Matthijs Reyers",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

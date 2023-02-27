@@ -1,9 +1,15 @@
+import int from './integer';
+import bool from './boolean';
+import enumeration from './enumeration';
+import email from './email';
 
-import { signedInt, unsignedInt } from './integer';
-import strict from './strict';
+import decorators from './decorators';
 
 export default {
-    signedInt,
-    unsignedInt,
-    strict
+    int,
+    bool,
+    enumeration,
+    email,
+
+    decorators
 };

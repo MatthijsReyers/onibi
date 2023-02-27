@@ -86,6 +86,7 @@ export class Http400Error extends HttpError {
         );
     }
 }
+
 /**
  * # Http401Error: Unauthorized.
  * The Http 401 Unauthorized response status code indicates that the client request has not been 
@@ -298,6 +299,23 @@ export class Http422Error extends HttpError {
             userSafe
         );
     }
+
+    /**
+     * Generates a Http422Error with an error message that mentions the name of the field whose 
+     * value was not a number, when a number was expected.
+     * 
+     * @param {string} field - Name of the nulled field.
+     * @param {boolean} userSafe - Mark error message as safe to show user.
+     */
+    public static withNonFiniteField(field: string, userSafe: boolean = true) {
+        return new Http422Error(
+            '422NotFinite',
+            'Non finite value',
+            `Expected field '${field}' to be a finite value.`,
+            userSafe
+        );
+    }
+
 }
 
 /**
@@ -330,7 +348,7 @@ export class Http500Error extends HttpError {
 }
 
 /**
- * ## Http500Error: Internal server error.
+ * ## Http501Error: Internal server error.
  * An internal server error has taken place, this is a last resort for when an error occurs 
  * completely unexpectedly and no more appropriate status code can be found.
  * 
