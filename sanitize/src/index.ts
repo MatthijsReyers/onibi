@@ -1,14 +1,16 @@
 import int from './integer';
 import bool from './boolean';
-import enumeration from './enumeration';
+import enums from './enums';
 import email from './email';
 
 import decorators from './decorators';
 
+export * from './errors';
+
 export default {
     int,
     bool,
-    enumeration,
+    enums,
     email,
 
     decorators
