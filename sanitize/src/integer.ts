@@ -135,8 +135,8 @@ namespace int
     }
 
     /**
-     * Set application wide rules for boolean sanitizer. Note that not all options have to be provided
-     * and default or previously set values will be kept if a new value is not included.
+     * Set application wide rules for integer sanitizer. Note that not all options have to be 
+     * provided and default or previously set values will be kept if a new value is not included.
      */
     export function setRules(rules: Partial<ExtendedIntSanitizerRules>) 
     {

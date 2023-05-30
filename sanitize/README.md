@@ -29,4 +29,5 @@ Listed below is a basic list of sanitizer functions to help you get started, che
 | `enums` | Basic enum sanitizer, will try to convert the given input to one of the provided enum values.
 | `email` | Email address, note that this is just an alias for `email.htmlInput`.
 | `email.rfc5322` | RFC5322 email address, will throw an error for any strings that are not valid email addresses according to the RFC5322 specification.
-| `email.htmlInput` | Email address, will throw an error for any email address that would not be valid according to the checks used by the HTML `<input type="email">` element, note that this is stricter than `email.rfc5322` and will not allow technically valid emails like `john.doe@[84.39.39.29]`.
+| `email.htmlInput` | Email address, will throw an error for any email address that would not be valid according to the checks used by the HTML `<input type="email">` element, note that this is stricter than `email.rfc5322` and will not allow technically valid emails like `john.doe@[84.39.39.29]`. |
+| `uuid` | UUID string sanitizer, will throw an error by default, but can also be provided with a default value or generator function.

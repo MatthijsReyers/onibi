@@ -18,6 +18,22 @@ export class SanitizerError extends Error
     }
 }
 
+export class InvalidUuidError extends SanitizerError
+{
+    constructor(value: string, field?: string) 
+    {
+        if (field)
+            super(`Invalid UUID`, `Received value '${value}' for field '${field}' was not a valid UUID.`);
+        super(`Invalid UUID`, `Received value '${value}' was not a valid UUID.`);
+    }
+
+    public override toHttpError() 
+    {
+        // TODO !!!!!!!!!!!!!!!!!!!!!!!!!
+        return new Http422Error('422InvalidUuid', this.name, this.description);
+    }
+}
+
 export class InvalidEmailError extends SanitizerError
 {
     private field?: string;

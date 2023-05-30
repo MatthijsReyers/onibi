@@ -1,6 +1,6 @@
 {
   "name": "@onibi/sanitize",
-  "version": "2.0.1",
+  "version": "2.0.3",
   "description": "Basic input validation tools with rich error messages.",
   "homepage": "https://github.com/MatthijsReyers/onibi/tree/main/sanitize",
   "main": "./lib/index.js",
@@ -16,8 +16,10 @@
   "devDependencies": {
     "@types/chai": "^4.3.3",
     "@types/mocha": "^9.1.1",
+    "@types/uuid": "^9.0.1",
     "chai": "^4.3.6",
     "mocha": "^10.0.0",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "uuid": "^9.0.0"
   }
 }
