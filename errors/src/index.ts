@@ -103,7 +103,7 @@ export class Http401Error extends HttpError {
 
     constructor(http: Partial<ApiErrorResponse>) {
         super(
-            Http400Error.defaultStatusCode, 
+            Http401Error.defaultStatusCode, 
             http['errorType'] || Http401Error.defaultErrorType,
             http['errorName'] || Http401Error.defaultErrorName,
             http['description'] || Http401Error.defaultDescription,
