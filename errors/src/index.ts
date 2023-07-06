@@ -61,7 +61,7 @@ export abstract class HttpError extends Error implements ApiErrorResponse {
 
 /**
  * # Http400Error: Bad request.
- * The Http 400 Unauthorized response status code indicates that the client request was malformed 
+ * The Http 400 Bad request status code indicates that the client request was malformed 
  * in some way and could not be processed because of it.
  * 
  * @extends HttpError
@@ -95,14 +95,33 @@ export class Http400Error extends HttpError {
  * @extends HttpError
  */
 export class Http401Error extends HttpError {
-    constructor() {
+    static defaultStatusCode = 401;
+    static defaultErrorType = '401UnauthorizedError';
+    static defaultErrorName = 'Unauthorized request';
+    static defaultDescription = 'Request was not completed because it lacks valid authentication, try reauthenticating.';
+    static defaultMessage = 'Please log in to access this resource.';
+
+    constructor(http: Partial<ApiErrorResponse>) {
         super(
-            401, '401UnauthorizedError',
-            'Unauthorized request',
-            'Request was not completed because it lacks valid authentication, try reauthenticating.',
-            'Please log in to access this resource.',
-            true
+            Http400Error.defaultStatusCode, 
+            http['errorType'] || Http401Error.defaultErrorType,
+            http['errorName'] || Http401Error.defaultErrorName,
+            http['description'] || Http401Error.defaultDescription,
+            http['message'] || Http401Error.defaultMessage,
+            http['isUserSafe'] || true,
         );
+    }
+
+    /**
+     * Creates a new Http401Error, with the `401InvalidUserPass` combination type. Use this error
+     * as response to invalid username/password combinations.
+     */
+    static invalidUserPass(): Http401Error {
+        return new Http401Error({
+            errorType: '401InvalidUserPass',
+            errorName: 'Invalid user/password combination',
+
+        });
     }
 }
 
