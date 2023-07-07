@@ -84,7 +84,7 @@ describe('RFC5322 Email addresses', () => {
     });
 });
 
-describe('HTML Form Email addresses', () => {
+describe('HTML <input type="email"> Email addresses', () => {
 
     it('should allow obvious good emails', () => {
         for (const address of VALID_EMAILS) {
@@ -100,4 +100,26 @@ describe('HTML Form Email addresses', () => {
         }).to.throw(InvalidEmailError)
     });
 
+});
+
+
+describe('Email sanitizer field name', () => {
+
+    it('should work without a field name', () => {
+        const email = VALID_EMAILS[0];
+        const result: string = sanitize.email.htmlInput(VALID_EMAILS[0]);
+    });
+
+    it('should work with a field name', () => {
+        const email = VALID_EMAILS[0];
+        const result: string = sanitize.email.htmlInput(email, { field: 'myField' });
+        expect(result).to.eq(email);
+    });
+
+    it('should use the field name in an error', () => {
+        const email = INVALID_EMAILS[0];
+        expect(() => {
+            sanitize.email.htmlInput(email, { field: 'myField' });
+        }).to.throw(InvalidEmailError, 'myField');
+    });
 });

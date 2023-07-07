@@ -1,6 +1,6 @@
 {
   "name": "@onibi/sanitize",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Basic input validation tools with rich error messages.",
   "homepage": "https://github.com/MatthijsReyers/onibi/tree/main/sanitize",
   "main": "./lib/index.js",

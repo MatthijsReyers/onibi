@@ -22,9 +22,8 @@ export class InvalidUuidError extends SanitizerError
 {
     constructor(value: string, field?: string) 
     {
-        if (field)
-            super(`Invalid UUID`, `Received value '${value}' for field '${field}' was not a valid UUID.`);
-        super(`Invalid UUID`, `Received value '${value}' was not a valid UUID.`);
+        if (field) super(`Invalid UUID`, `Received value '${value}' for field '${field}' was not a valid UUID.`);
+        else super(`Invalid UUID`, `Received value '${value}' was not a valid UUID.`);
     }
 
     public override toHttpError() 
@@ -43,7 +42,7 @@ export class InvalidEmailError extends SanitizerError
     {
         if (field)
             super(`Invalid Email Address`, `Received value '${value}' for field '${field}' was not a valid email address.`);
-        super(`Invalid Email Address`, `Received value '${value}' was not a valid email address.`);
+        else super(`Invalid Email Address`, `Received value '${value}' was not a valid email address.`);
         this.field = field;
         this.value = value;
     }

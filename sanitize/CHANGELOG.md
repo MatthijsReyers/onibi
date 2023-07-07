@@ -1,5 +1,8 @@
 # Changelog
 
+## [2.0.4] - 2023-07-08
+- Fixed field name not working in email sanitizer bug.
+
 ## [2.0.3] - 2023-05-30
 - Added sanitizer for UUID strings.
 - Fixed typo in integer sanitizer doc comments.
