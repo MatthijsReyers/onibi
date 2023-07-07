@@ -45,7 +45,11 @@ export function errorHandlerBuilder(options?: BuilderOptions) {
                     return next();
                 }
         },
-        (error: Error, req: Request, res: Response, next: Function) => {
+        (error: Error|HttpError, req: Request, res: Response, next: Function) => {
+
+            if (typeof (error as any)['toHttpError'] === 'function') {
+                error = (error as any).toHttpError();
+            }
 
             if (!(error instanceof HttpError)) {
                 if (logNonHttpErrors) {
@@ -55,7 +59,7 @@ export function errorHandlerBuilder(options?: BuilderOptions) {
                 error = new Http500Error(error);
             }
 
-            let httpError: HttpError = <HttpError>error;
+            const httpError = error as HttpError;
 
             res.status(httpError.statusCode);
 
