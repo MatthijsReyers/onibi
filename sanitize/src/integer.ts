@@ -1,9 +1,10 @@
 import { NanValueError, NegativeValueError, NullValueError, UnexpectedValueError } from "./errors";
+import { Field } from "./field";
 import { ExtendedIntSanitizerRules, IntegerSanitizerRules, RangedIntSanitizerRules, 
          RuleKey, UnsignedIntSanitizerRules } from "./integer.types";
 
-const SIGNED_REGEX = /^(\s*)((((-(\s*))?)(\d+))|(0x([0-9a-fA-F]+)))(\s*)$/;
-const UNSIGNED_REGEX = /^(\s*)((\d+)|(0x([0-9a-fA-F]+)))(\s*)$/;
+// const SIGNED_REGEX = /^(\s*)((((-(\s*))?)(\d+))|(0x([0-9a-fA-F]+)))(\s*)$/;
+// const UNSIGNED_REGEX = /^(\s*)((\d+)|(0x([0-9a-fA-F]+)))(\s*)$/;
 
 /**
  * Application wide integer sanitizer behavior.
@@ -37,11 +38,10 @@ function getRule<T>(ruleKey: RuleKey, rules?: Partial<ExtendedIntSanitizerRules>
  * nearest integer.
  * 
  * @param {any}   input  - Input to sanitize.
- * @param {rules} Partial<RangedIntSanitizerRules> - (Optional) rules to locally overwrite the
- *                         global integer sanitization rules for this function call.
- * @param {string} field - Name of the field that is being sanitized, (used in error messages).
+ * @param {rules} Partial<RangedIntSanitizerRules> - (Optional) rules to locally overwrite the 
+ *                global integer sanitization rules for this function call.
  */
-function int(input: any, rules?: Partial<IntegerSanitizerRules>, field?: string): number
+function int(input: any, rules?: Partial<IntegerSanitizerRules & Field>): number
 {
     if (typeof input === 'string') {
         if (getRule<boolean>('trimStrings')) {
@@ -57,7 +57,7 @@ function int(input: any, rules?: Partial<IntegerSanitizerRules>, field?: string)
                 return NaN;
             let defaultValue = getRule<number | 'error'>('default', rules);
             if (rule === 'error' || defaultValue === 'error')
-                throw new NanValueError(field);
+                throw new NanValueError(rules?.field);
             if (rule === 'default')
                 return defaultValue;
             return rule;
@@ -74,7 +74,7 @@ function int(input: any, rules?: Partial<IntegerSanitizerRules>, field?: string)
     }
     let defaultValue = getRule<number | 'error'>('default', rules);
     if (defaultValue === 'error')
-        throw new UnexpectedValueError(field);
+        throw new UnexpectedValueError(rules?.field);
     return defaultValue;
 }
 
@@ -88,22 +88,20 @@ namespace int
      * 
      * @param {any} input - Input to sanitize.
      * @param {number} defaultValue - (Optional) default value to be used if the given user input 
-     *                                cannot be parsed, set to 0 if none is provided.
-     * @param {string} field - Name of the field that is being sanitized, (used in error messages).
+     *                 cannot be parsed, set to 0 if none is provided.
      */
-    export function unsigned(input: any, rules?: Partial<UnsignedIntSanitizerRules>, 
-                             field?: string): number 
+    export function unsigned(input: any, rules?: Partial<UnsignedIntSanitizerRules & Field>): number 
     {
-        let value = signed(input, rules, field);
+        let value = signed(input, rules);
         if (value < 0) {
             if (getRule('signedValues', rules) === 'default') {
                 if (getRule('default', rules) === 'error') {
-                    throw new NegativeValueError(field);
+                    throw new NegativeValueError(rules?.field);
                 } 
                 return getRule('default', rules);
             }
             if (getRule('signedValues', rules) === 'error') {
-                throw new NegativeValueError(field);
+                throw new NegativeValueError(rules?.field);
             }
             if (getRule('signedValues', rules) === 'abs') {
                 return Math.abs(value);
@@ -123,12 +121,11 @@ namespace int
      * @param {number} min   - Smallest value the input may be.
      * @param {number} max   - Biggest value the input may be. 
      * @param {rules}  Partial<RangedIntSanitizerRules> - (Optional) rules to locally overwrite the
-     *                       global integer sanitization rules for this function call.
+     *                 global integer sanitization rules for this function call.
      */
-    export function ranged(input: any, min: number, max: number, 
-                           rules?: Partial<RangedIntSanitizerRules>, field?: string) 
+    export function ranged(input: any, min: number, max: number, rules?: Partial<RangedIntSanitizerRules & Field>) 
     {
-        let value = signed(input, rules, field);
+        let value = signed(input, rules);
         if (value < min) return min;
         if (value > max) return max;
         return value;
