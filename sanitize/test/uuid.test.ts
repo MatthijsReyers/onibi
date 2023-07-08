@@ -39,11 +39,27 @@ describe('UUID strings', () => {
     ];
 
     it('should throw an error for non UUID strings', () => {
-        
         for (const invalid of INVALID_UUID) {
             expect(() => {
                 sanitize.uuid(invalid)
             }).to.throw(InvalidUuidError, invalid+'');
         }
+    });
+
+    it('should allow null values with orNull', () => {
+        const value = sanitize.uuid.orNull(null);
+        expect(value).to.equal(null);
+    });
+
+    it('should allow valid UUIDs with orNull', () => {
+        for (const id of VALID_UUID) {
+            const value = sanitize.uuid.orNull(id);
+            expect(value).to.equal(id);
+        }
+        let id = uuid.v1();
+        expect(sanitize.uuid.orNull(id)).to.equal(id);
+        
+        id = uuid.v4();
+        expect(sanitize.uuid.orNull(id)).to.equal(id);
     });
 });

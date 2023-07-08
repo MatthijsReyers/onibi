@@ -9,6 +9,6 @@
 export function isNullable(obj: any): boolean {
     if (obj === null) return true;
     if (obj === undefined) return true;
-    if (isNaN(obj)) return true;
+    if (typeof obj === 'number' && isNaN(obj)) return true;
     return false;
 }
