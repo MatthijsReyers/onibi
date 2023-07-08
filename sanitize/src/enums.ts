@@ -66,8 +66,7 @@ function enums<T>(input: any, values: T[], rules?: Partial<EnumSanitizerRules & 
 
 namespace enums
 {
-
-    function orNull<T>(input: any, values: T[], rules?: Partial<EnumSanitizerRules & Field>): T|null
+    export function orNull<T>(input: any, values: T[], rules?: Partial<EnumSanitizerRules & Field>): T|null
     {
         if (isNullable(input)) return null;
         return enums<T>(input, values, rules);

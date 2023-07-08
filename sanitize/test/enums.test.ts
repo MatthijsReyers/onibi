@@ -37,15 +37,20 @@ describe('Enumerations', () => {
         }).to.throw(EnumValueError, /(.*)apple(.*)Apple(.*)Kiwi(.*)/);
     });
 
-    it('should not allow null values by default', () => {
+    it('should not allow null values', () => {
         expect(() => {
             sanitize.enums(null, FRUITS);
         }).to.throw(NullValueError);
     });
 
-    it('should allow null values when enabled', () => {
-        let value = sanitize.enums(null, FRUITS, { allowNull: true });
+    it('should allow null values with orNull()', () => {
+        let value = sanitize.enums.orNull(null, FRUITS);
         expect(value).to.be.null;
+    });
+
+    it('should allow normal values with orNull()', () => {
+        let value = sanitize.enums.orNull('Apple', FRUITS);
+        expect(value).to.equal('Apple');
     });
 
     it('should allow null values when in enum array', () => {
