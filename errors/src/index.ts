@@ -21,6 +21,13 @@ export interface ApiErrorResponse {
     stackTrace?: string;
 }
 
+/**
+ * Interface for custom error types that implement a toHttpError() function for converting the 
+ * custom error to an HttpError.
+ */
+export interface ToHttpError {
+    toHttpError(): HttpError;
+}
 
 export abstract class HttpError extends Error implements ApiErrorResponse {
     statusCode: number;
