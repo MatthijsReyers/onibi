@@ -74,7 +74,7 @@ namespace uuid
     }
 
     /**
-     * UUID sanitizer that outputs UUID strings or null.
+     * UUID sanitizer that outputs UUID strings or null. Note that empty strings are treated as null here.
      * 
      * @param {any} input - Input to sanitize.
      * @param {rules} Partial<UuidSanitizerRules> - (Optional) rules to locally overwrite the global uuid sanitization rules for this function call.
@@ -82,7 +82,8 @@ namespace uuid
      */
     export function orNull(input: any, rules?: Partial<UuidSanitizerRules & Field>): Uuid|null
     {
-        if (isNullable(input)) return null
+        if (isNullable(input)) return null;
+        if (typeof input === 'string' && input.trim().length === 0) return null;
         return uuid(input, rules);
     }
 }

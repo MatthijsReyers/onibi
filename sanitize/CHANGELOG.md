@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.1.0] - 2023-07-08
+- Moved field name to rules object for all sanitizers.
+- Added orNull sanitizers to uuid and enum sanitizers.
+
 ## [2.0.4] - 2023-07-08
 - Fixed field name not working in email sanitizer bug.
 
