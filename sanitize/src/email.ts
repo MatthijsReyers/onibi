@@ -63,12 +63,10 @@ namespace email
      * @param {any}                 input - Input to sanitize.
      * @param {EmailSanitizerRules} rules - (Optional) rules to overwrite global email sanitizer 
      *                                      rules for this function call.
-     * @param {string}              field - (Optional) Name of the field that is being sanitized
-     *                                      (used in error messages).
      */
-    export function rfc5322(input: any, rules?: EmailSanitizerRules, field?: string): string
+    export function rfc5322(input: any, rules?: Partial<EmailSanitizerRules & Field>): string
     {
-        return check(RFC5322_EMAIL, input, rules, field);
+        return check(RFC5322_EMAIL, input, rules, rules?.field);
     }
 
     export var htmlInput = email;

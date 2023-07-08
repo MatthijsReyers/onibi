@@ -1,5 +1,6 @@
 import { BooleanSanitizerRules, RuleKey } from "./boolean.types";
 import { NanValueError, NullValueError, UndefinedValueError, UnexpectedValueError } from "./errors";
+import { Field } from "./field";
 
 /**
  * Application wide boolean sanitizer behavior.
@@ -34,10 +35,8 @@ function getRule<T>(ruleKey: RuleKey, rules?: Partial<BooleanSanitizerRules>): T
  * @param {any} input: The input that must be converted to a boolean.
  * @param {BooleanSanitizerRules} rules: (Optional) override the global sanitizer rules and use 
  *                                       these rules instead.
- * @param {string} fieldName: (Optional) name of the field that is being sanitized, shown in error 
- *                            messages if provided.
  */
-function bool(input: any, rules?: Partial<BooleanSanitizerRules>, fieldName?: string): boolean
+function bool(input: any, rules?: Partial<BooleanSanitizerRules & Field>): boolean
 {
     if (typeof input === 'boolean') {
         return !!(input);
@@ -55,7 +54,7 @@ function bool(input: any, rules?: Partial<BooleanSanitizerRules>, fieldName?: st
     if (input === undefined) {
         if (getRule<any>('undefinedValues', rules) === 'error' 
         || (getRule<any>('undefinedValues', rules) === 'default' && getRule<any>('undefinedValues', rules) === 'error')) {
-            throw new UndefinedValueError(fieldName);
+            throw new UndefinedValueError(rules?.field);
         }
         if (getRule<any>('undefinedValues') === 'default') {
             return getRule<boolean>('default', rules);
@@ -65,7 +64,7 @@ function bool(input: any, rules?: Partial<BooleanSanitizerRules>, fieldName?: st
     if (input === null) {
         if (getRule<any>('nullValues', rules) === 'error' 
         || (getRule<any>('nullValues', rules) === 'default' && getRule<any>('default', rules) === 'error')) {
-            throw new NullValueError(fieldName);
+            throw new NullValueError(rules?.field);
         }
         if (getRule<any>('nullValues') === 'default') {
             return getRule<boolean>('default', rules);
@@ -75,7 +74,7 @@ function bool(input: any, rules?: Partial<BooleanSanitizerRules>, fieldName?: st
     if (isNaN(input)) {
         if (getRule<any>('nanValues', rules) === 'error' 
         || (getRule<any>('nanValues', rules) === 'default' && getRule<any>('default', rules) === 'error')) {
-            throw new NanValueError(fieldName);
+            throw new NanValueError(rules?.field);
         }
         if (getRule<any>('nanValues') === 'default') {
             return getRule<boolean>('default', rules);
@@ -83,7 +82,7 @@ function bool(input: any, rules?: Partial<BooleanSanitizerRules>, fieldName?: st
         return getRule<boolean>('nanValues', rules);
     }
     if (getRule<boolean|'error'>('default') === 'error') {
-        throw new UnexpectedValueError(fieldName, (input.toString()))
+        throw new UnexpectedValueError(rules?.field, (input.toString()))
     }
     return !!getRule<boolean>('default', rules);
 }

@@ -11,16 +11,6 @@ export interface EnumSanitizerRules
      */
     default?: any;
 
-    /**
-     * How should null values be allowed? When this options is set to true any null input will be
-     * passed on, when set to false null input will be converted into the default value when 
-     * available or a NullValueError will be thrown.
-     * 
-     * Note that adding null to the enum values array will have the same effect as locally setting 
-     * this option to true. 
-     */
-    allowNull: boolean;
-
     /** 
      * Should leading and trailing spaces be removed from string types before converting them
      * to booleans? (Will cause "\tVALUE " to be treated the same as "VALUE").

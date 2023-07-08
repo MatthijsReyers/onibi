@@ -1,12 +1,13 @@
 import { EnumSanitizerRules, RuleKey } from "./enums.types";
 import { EnumValueError, NullValueError } from "./errors";
+import { Field } from "./field";
+import { isNullable } from "./utils";
 
 /**
  * Application wide integer sanitizer behavior.
  */
 var globalRules: EnumSanitizerRules = {
     default:       undefined,
-    allowNull:     false,
     trimStrings:   true,
     caseSensitive: false
 }
@@ -34,18 +35,10 @@ function getRule<T>(ruleKey: RuleKey, rules?: Partial<EnumSanitizerRules>): T
  * @param {any} input -
  * @param {T[]} values -
  * @param {Partial<EnumSanitizerRules>} rules - 
- * @param {string} field - (Optional) name of the field that is being sanitized 
  * @returns {T} Enum value from the enum values array.
  */
-function enums<T>(input: any, values: T[], rules?: Partial<EnumSanitizerRules>, field?: string)
+function enums<T>(input: any, values: T[], rules?: Partial<EnumSanitizerRules & Field>): T
 {
-    if (input === null) {
-        if (getRule('allowNull', rules) === true || values.includes(<any>null)) {
-            return null;
-        } else if  (getRule('default', rules) === undefined) {
-            throw new NullValueError(field);
-        }
-    }
     if (typeof input === 'string' && getRule('trimStrings', rules) === true) {
         input = input.trim();
     }
@@ -62,8 +55,11 @@ function enums<T>(input: any, values: T[], rules?: Partial<EnumSanitizerRules>, 
             return val;
         }
     }
+    if (input === null) {
+        throw new NullValueError(rules?.field);
+    }
     if (getRule('default', rules) === undefined) {
-        throw new EnumValueError(values, input, field);
+        throw new EnumValueError(values, input, rules?.field);
     }
     return getRule<T>('default', rules);
 }
@@ -71,6 +67,11 @@ function enums<T>(input: any, values: T[], rules?: Partial<EnumSanitizerRules>, 
 namespace enums
 {
 
+    function orNull<T>(input: any, values: T[], rules?: Partial<EnumSanitizerRules & Field>): T|null
+    {
+        if (isNullable(input)) return null;
+        return enums<T>(input, values, rules);
+    }
 }
 
 export = enums;
