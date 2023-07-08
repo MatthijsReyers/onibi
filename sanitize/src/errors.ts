@@ -1,6 +1,6 @@
-import { Http422Error } from "@onibi/errors";
+import { Http422Error, ToHttpError } from "@onibi/errors";
 
-export class SanitizerError extends Error
+export class SanitizerError extends Error implements ToHttpError
 {
     name: string;
     description: string;

@@ -1,6 +1,6 @@
 {
   "name": "@onibi/sanitize",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Basic input validation tools with rich error messages.",
   "homepage": "https://github.com/MatthijsReyers/onibi/tree/main/sanitize",
   "main": "./lib/index.js",
@@ -11,7 +11,7 @@
   "author": "Matthijs Reyers",
   "license": "ISC",
   "dependencies": {
-    "@onibi/errors": "^0.1.9"
+    "@onibi/errors": "^0.1.14"
   },
   "devDependencies": {
     "@types/chai": "^4.3.3",

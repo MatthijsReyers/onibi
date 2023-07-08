@@ -1,6 +1,9 @@
 # Changelog
 
 ## [2.1.0] - 2023-07-08
+- Imported and implemented `ToHttpError` interface for proper support.
+
+## [2.1.0] - 2023-07-08
 - Moved field name to rules object for all sanitizers.
 - Added orNull sanitizers to uuid and enum sanitizers.
 

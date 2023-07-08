@@ -15,6 +15,11 @@ let x = sanitize.int.unsigned(-73);    // Clamped to 0.
 let y = sanitize.int.unsigned(null);   // Defaults to 0
 ```
 
+## Express integration
+
+All `SanitizerError` types implement the `ToHttpError` interface from `@onibi/errors`, which means that they can be converted http errors that can be caught and converted to JSON by the `@onibi/errorhandler`.
+
+
 ## Basic documentation
 
 Listed below is a basic list of sanitizer functions to help you get started, checkout the [full documentation on GitHub](https://github.com/MatthijsReyers/onibi/blob/main/sanitize/DOCS.md) for more details like the specific rules to change the sanitizer behaviour.
