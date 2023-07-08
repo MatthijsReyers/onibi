@@ -1,4 +1,6 @@
 import { InvalidUuidError } from "./errors";
+import { Field } from "./field";
+import { isNullable } from "./utils";
 import { RuleKey, Uuid, UuidSanitizerRules } from "./uuid.types";
 
 const UUID_REGEX = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/;
@@ -24,13 +26,13 @@ function getRule<T>(ruleKey: RuleKey, rules?: Partial<UuidSanitizerRules>): T
 /**
  * UUID sanitizer for UUID strings in the form '4ab23e20-fee3-11ed-8f2a-a1bf63269e35'.
  * 
+ * @throws {InvalidUuidError} when the input is not a valid v1 UUID.
+ * 
  * @param {any} input - Input to sanitize.
  * @param {rules} Partial<UuidSanitizerRules> - (Optional) rules to locally overwrite the global uuid sanitization rules for this function call.
- * @param {string} field - (Optional) Name of the field that is being sanitized, (used in error messages).
- * @throws {InvalidUuidError} when the input is not a valid v1 UUID.
  * @returns {Uuid} 
  */
-function uuid(input: any, rules?: Partial<UuidSanitizerRules>, field?: string): Uuid
+function uuid(input: any, rules?: Partial<UuidSanitizerRules & Field>): Uuid
 {
     if (typeof input === 'string') {
         if (getRule<boolean>('trimStrings', rules)) {
@@ -42,7 +44,7 @@ function uuid(input: any, rules?: Partial<UuidSanitizerRules>, field?: string): 
     }
     const defaultVal = getRule<string | ((input: any) => Uuid)>('default', rules);
     if (defaultVal === 'error') {
-        throw new InvalidUuidError(''+input, field);
+        throw new InvalidUuidError(''+input, rules?.field);
     }
     if (defaultVal instanceof Function) {
         return defaultVal(input);
@@ -69,6 +71,19 @@ namespace uuid
                 }
             }
         }
+    }
+
+    /**
+     * UUID sanitizer that outputs UUID strings or null.
+     * 
+     * @param {any} input - Input to sanitize.
+     * @param {rules} Partial<UuidSanitizerRules> - (Optional) rules to locally overwrite the global uuid sanitization rules for this function call.
+     * @returns {Uuid | null} 
+     */
+    export function orNull(input: any, rules?: Partial<UuidSanitizerRules & Field>): Uuid|null
+    {
+        if (isNullable(input)) return null
+        return uuid(input, rules);
     }
 }
 
