@@ -141,7 +141,7 @@ describe('Unsigned integers', () => {
         let result: number;
 
         expect(() => {
-            sanitize.int.unsigned(-3920, { signedValues: 'error' }, 'WACKY');
+            sanitize.int.unsigned(-3920, { signedValues: 'error', field: 'WACKY' });
         }).to.throw(NegativeValueError, 'WACKY');
 
         result = sanitize.int.unsigned(-1);
@@ -150,27 +150,29 @@ describe('Unsigned integers', () => {
         sanitize.int.setRules({ signedValues: 'error' });
 
         expect(() => {
-            sanitize.int.unsigned(-22, {}, 'QUACKY');
+            sanitize.int.unsigned(-22, { field: 'QUACKY' });
         }).to.throw(NegativeValueError, 'negative');
 
         sanitize.int.setRules({ signedValues: 0 });
 
-        result = sanitize.int.unsigned(-555, {}, 'TACKY');
+        result = sanitize.int.unsigned(-555, { field: 'TACKY' });
         expect(result).to.equal(0);
 
         expect(() => {
             sanitize.int.unsigned(-908, {
-                default: 'error', signedValues: 'default' 
-            }, 'LACKY');
+                default: 'error', 
+                signedValues: 'default',
+                field: 'LACKY',
+            });
         }).to.throw(NegativeValueError, 'negative');
 
-        result = sanitize.int.unsigned(-32, {}, 'MACKY');
+        result = sanitize.int.unsigned(-32, { field: 'MACKY' });
         expect(result).to.equal(0);
 
         sanitize.int.setRules({ default: 'error', signedValues: 'default'});
 
         expect(() => {
-            sanitize.int.unsigned(-233, {}, 'YACKY');
+            sanitize.int.unsigned(-233, { field: 'YACKY' });
         }).to.throw(NegativeValueError, 'YACKY');
 
         sanitize.int.setRules({ default: 0, signedValues: 0 });
@@ -361,7 +363,7 @@ describe('Integer NaN values', () => {
         let result: number;
 
         expect(() => {
-            sanitize.int(NaN, { nanValues: 'error' }, 'TOTO');
+            sanitize.int(NaN, { nanValues: 'error', field: 'TOTO' });
         }).to.throw(NanValueError, 'TOTO');
 
         result = sanitize.int.signed(NaN);
@@ -373,16 +375,16 @@ describe('Integer NaN values', () => {
         expect(result).to.equal(389);
 
         expect(() => {
-            sanitize.int.signed(NaN, {}, 'LOTO');
+            sanitize.int.signed(NaN, { field: 'LOTO' });
         }).to.throw(NanValueError, 'LOTO');
 
         sanitize.int.setRules({ nanValues: 'default' });
 
-        result = sanitize.int(NaN, {}, 'MIYAMOTO');
+        result = sanitize.int(NaN, { field: 'MIYAMOTO' });
         expect(result).to.equal(0);
 
         expect(() => {
-            sanitize.int.unsigned(NaN, { default: 'error', nanValues: 'default' }, 'GOGO');
+            sanitize.int.unsigned(NaN, { default: 'error', nanValues: 'default', field: 'GOGO' });
         }).to.throw(NanValueError, 'GOGO');
 
         result = sanitize.int.unsigned(899);
@@ -391,7 +393,7 @@ describe('Integer NaN values', () => {
         sanitize.int.setRules({ default: 'error', nanValues: 'default' });
 
         expect(() => {
-            sanitize.int.unsigned(NaN, {}, 'LOKO');
+            sanitize.int.unsigned(NaN, { field: 'LOKO' });
         }).to.throw(NanValueError, 'LOKO');
 
         sanitize.int.setRules({ default: 0, nanValues: 'default' });
