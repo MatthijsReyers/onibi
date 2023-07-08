@@ -1,6 +1,7 @@
 import { BooleanSanitizerRules, RuleKey } from "./boolean.types";
 import { NanValueError, NullValueError, UndefinedValueError, UnexpectedValueError } from "./errors";
 import { Field } from "./field";
+import { isNullable } from "./utils";
 
 /**
  * Application wide boolean sanitizer behavior.
@@ -115,6 +116,12 @@ namespace bool
                 }
             }
         }
+    }
+
+    export function orNull(input: any, rules?: Partial<BooleanSanitizerRules & Field>): boolean|null
+    {
+        if (isNullable(input)) return null;
+        return bool(input, rules);
     }
 }
 
