@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Http404Error, HttpError, Http500Error, ApiErrorResponse } from '@onibi/errors';
+import { Http404Error, HttpError, Http500Error, ApiErrorResponse, ToHttpError } from '@onibi/errors';
 
 export interface BuilderOptions {
     /* Defaults to false, if set to true the `stackTrace` field of the `ApiErrorResponse` will be populated with the stack 
@@ -45,11 +45,14 @@ export function errorHandlerBuilder(options?: BuilderOptions) {
                     return next();
                 }
         },
-        (error: Error|HttpError, req: Request, res: Response, next: Function) => {
+        (error: Error|HttpError|ToHttpError, req: Request, res: Response, next: Function) => {
 
             if (typeof (error as any)['toHttpError'] === 'function') {
-                error = (error as any).toHttpError();
+                error = (error as any).toHttpError() as HttpError;
             }
+
+            // Inform typescript compiler that the type has narrowed.
+            error = error as HttpError|Error;
 
             if (!(error instanceof HttpError)) {
                 if (logNonHttpErrors) {
