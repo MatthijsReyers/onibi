@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.1.2] - 2023-05-30
+- Added `Uuid()` decorator for uuid sanitizer.
+- Added `NotNull()` decorator for none null values.
+
 ## [2.1.0] - 2023-07-08
 - Imported and implemented `ToHttpError` interface for proper support.
 
