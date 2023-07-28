@@ -10,4 +10,5 @@ export default {
     RangedInt,
     Bool,
     Uuid,
+    NotNull,
 }
