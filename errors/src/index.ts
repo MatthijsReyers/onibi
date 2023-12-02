@@ -1,15 +1,9 @@
 export interface ApiErrorResponse {
     /** HTTP status code. */
-    statusCode: number;
+    code: number;
 
-    /** Unique type id for this error type. */
-    errorType: string;
-
-    /** Generic name for this error type, may be shown to end users. */
-    errorName: string;
-
-    /** Error description for programmers/debugging, should NOT be shown to end users. */
-    description: string;
+    /** Unique name/id for this error type. */
+    name: string;
 
     /** Error message that describes the error in more detail, may be shown to end users. */
     message: string;
@@ -29,37 +23,45 @@ export interface ToHttpError {
     toHttpError(): HttpError;
 }
 
+function mergeDefaults(
+    defaults: ApiErrorResponse, 
+    config?: Partial<ApiErrorResponse>
+): ApiErrorResponse {
+    let out: any = {};
+    for (const key in defaults) {
+        const k = key as keyof ApiErrorResponse;
+        if (config && Object.prototype.hasOwnProperty.call(config, key)) {
+            out[key] = config[k];
+        } else {
+            out[key] = defaults[k];
+        }
+    }
+    // Always get the status code from the defaults.
+    if (defaults.code) {
+        out.code = defaults.code;
+    }
+    return (out as ApiErrorResponse);
+}
+
+
 export abstract class HttpError extends Error implements ApiErrorResponse {
-    statusCode: number;
-    errorType: string;
-    errorName: string;
-    description: string;
+    code: number;
+    name: string;
     message: string;
     isUserSafe: boolean;
 
-    constructor(
-        statusCode: number,
-        errorType: string,
-        errorName: string,
-        description: string,
-        message: string,
-        isUserSafe: boolean = false
-    ) {
-        super(message);
-        this.statusCode = statusCode;
-        this.errorType = errorType;
-        this.errorName = errorName;
-        this.description = description;
-        this.message = message;
-        this.isUserSafe = isUserSafe;
+    constructor(config: ApiErrorResponse) {
+        super(config.message);
+        this.code = config.code;
+        this.name = config.name;
+        this.message = config.message;
+        this.isUserSafe = config.isUserSafe;
     }
 
     public toJSON(): ApiErrorResponse {
         return {
-            statusCode: this.statusCode,
-            errorType: this.errorType,
-            errorName: this.errorName,
-            description: this.description,
+            code: this.code,
+            name: this.name,
             message: this.message,
             isUserSafe: this.isUserSafe
         }
@@ -74,23 +76,15 @@ export abstract class HttpError extends Error implements ApiErrorResponse {
  * @extends HttpError
  */
 export class Http400Error extends HttpError {
-    static defaultStatusCode: number = 400;
-    static defaultErrorType: string = '404BadRequest';
-    static defaultName: string = 'Bad request';
-    static defaultDescription: string = 'The request could not be processed because it is malformed in some way.';
+    static defaultError: ApiErrorResponse = {
+        code: 400,
+        name: '404BadRequest',
+        message: 'The request could not be processed because it is malformed in some way.',
+        isUserSafe: false,
+    };
 
-    constructor(
-        message: string = Http400Error.defaultDescription,
-        userSafe: boolean = true
-    ) {
-        super(
-            Http400Error.defaultStatusCode,
-            Http400Error.defaultErrorType,
-            Http400Error.defaultName,
-            Http400Error.defaultDescription,
-            message,
-            userSafe
-        );
+    constructor(config?: Partial<ApiErrorResponse>) {
+        super(mergeDefaults(Http400Error.defaultError, config));
     }
 }
 
@@ -102,21 +96,15 @@ export class Http400Error extends HttpError {
  * @extends HttpError
  */
 export class Http401Error extends HttpError {
-    static defaultStatusCode = 401;
-    static defaultErrorType = '401UnauthorizedError';
-    static defaultErrorName = 'Unauthorized request';
-    static defaultDescription = 'Request was not completed because it lacks valid authentication, try reauthenticating.';
-    static defaultMessage = 'Please log in to access this resource.';
+    static defaultError: ApiErrorResponse = {
+        code: 401,
+        name: '401UnauthorizedError',
+        message: 'Request was not completed because it lacks valid authentication, try reauthenticating.',
+        isUserSafe: false,
+    };
 
-    constructor(http: Partial<ApiErrorResponse>) {
-        super(
-            Http401Error.defaultStatusCode, 
-            http['errorType'] || Http401Error.defaultErrorType,
-            http['errorName'] || Http401Error.defaultErrorName,
-            http['description'] || Http401Error.defaultDescription,
-            http['message'] || Http401Error.defaultMessage,
-            http['isUserSafe'] || true,
-        );
+    constructor(config?: Partial<ApiErrorResponse>) {
+        super(mergeDefaults(Http401Error.defaultError, config));
     }
 
     /**
@@ -125,9 +113,9 @@ export class Http401Error extends HttpError {
      */
     static invalidUserPass(): Http401Error {
         return new Http401Error({
-            errorType: '401InvalidUserPass',
-            errorName: 'Invalid user/password combination',
-
+            name: '401InvalidUserPass',
+            message: 'Invalid user/password combination, please try again',
+            isUserSafe: true,
         });
     }
 }
@@ -140,16 +128,15 @@ export class Http401Error extends HttpError {
  * @extends HttpError
  */
 export class Http403Error extends HttpError {
-    constructor(
-        errorType: string = '403AuthenticationError',
-        title: string = 'Authentication error',
-        description: string = 'Request was not completed because the provided authentication does not provide access to this resource.',
-        message: string = 'Sorry, you do not have access to this resource.',
-        isUserSafe: boolean = true
-    ) {
-        super(
-            403, errorType, title, description, message, isUserSafe
-        );
+    static defaultError: ApiErrorResponse = {
+        code: 403,
+        name: '403AuthenticationError',
+        message: 'Request was not completed because the provided authentication does not provide access to this resource.',
+        isUserSafe: true,
+    };
+
+    constructor(config?: Partial<ApiErrorResponse>) {
+        super(mergeDefaults(Http403Error.defaultError, config));
     }
 }
 
@@ -161,23 +148,15 @@ export class Http403Error extends HttpError {
  * @extends HttpError
  */
 export class Http404Error extends HttpError {
-    static defaultStatusCode: number = 404;
-    static defaultErrorType: string = '404NotFound';
-    static defaultName: string = 'Resource not found';
-    static defaultDescription: string = 'The requested resource could not be found because it was deleted or never existed to begin with.';
+    static defaultError: ApiErrorResponse = {
+        code: 404,
+        name: '404NotFound',
+        message: 'The requested resource could not be found because it was deleted or never existed to begin with.',
+        isUserSafe: true,
+    };
 
-    constructor(
-        message: string = 'Sorry, this page does not exist or was deleted.',
-        isUserSafe: boolean = true
-    ) {
-        super(
-            Http404Error.defaultStatusCode,
-            Http404Error.defaultErrorType,
-            Http404Error.defaultName,
-            Http404Error.defaultDescription,
-            message,
-            isUserSafe
-        );
+    constructor(config?: Partial<ApiErrorResponse>) {
+        super(mergeDefaults(Http404Error.defaultError, config));
     }
 
     /**
@@ -186,7 +165,9 @@ export class Http404Error extends HttpError {
      * @param {string} resourceName - Type name of the resource.
      */
     static withName(resourceName: string) {
-        return new Http404Error(`Sorry, this ${resourceName} does not exist or was deleted.`, true);
+        return new Http404Error({
+            message: `Sorry, this ${resourceName} does not exist or was deleted.`
+        });
     }
 }
 
@@ -197,23 +178,15 @@ export class Http404Error extends HttpError {
  * @extends HttpError
  */
 export class Http415Error extends HttpError {
-    static defaultStatusCode: number = 415;
-    static defaultErrorType: string = '415Unsupported';
-    static defaultName: string = 'Unsupported media type';
-    static defaultDescription: string = 'Request was not completed because the provided media type is not supported.';
+    static defaultError: ApiErrorResponse = {
+        code: 415,
+        name: '415Unsupported',
+        message: 'The provided media type is not supported.',
+        isUserSafe: true,
+    };
 
-    constructor(
-        message: string = 'Sorry, the provided media type is not supported.',
-        isUserSafe: boolean = true
-    ) {
-        super(
-            Http415Error.defaultStatusCode,
-            Http415Error.defaultErrorType,
-            Http415Error.defaultName,
-            Http415Error.defaultDescription,
-            message,
-            isUserSafe
-        );
+    constructor(config?: Partial<ApiErrorResponse>) {
+        super(mergeDefaults(Http415Error.defaultError, config));
     }
 
     /**
@@ -222,13 +195,14 @@ export class Http415Error extends HttpError {
      * 
      * @param {string} filetype  - File extension of the filetype that was provided.
      * @param {string[]} allowed - List of allowed filetypes that the user could provide instead. Defaults
-     *                              to empty list in which case the error message will not suggest any filetypes.
+     *                             to empty list in which case the error message will not suggest any filetypes.
      */
     public static withFileType(filetype: string, allowed: string[] = []): Http415Error {
         let message = `Sorry '${filetype}' files are not supported.`
-        if (allowed.length)
+        if (allowed.length) {
             message += ` Please provide one of these instead: "${allowed.join('", "')}".`;
-        return new Http415Error(message);
+        }
+        return new Http415Error({ message });
     }
 }
 
@@ -241,25 +215,15 @@ export class Http415Error extends HttpError {
  * @extends HttpError
  */
 export class Http422Error extends HttpError {
-    static defaultStatusCode: number = 422;
-    static defaultErrorType: string = '422UnprocessableEntity';
-    static defaultName: string = 'Unprocessable entity';
-    static defaultDescription: string = 'Request was understood but not completed because its instructions could not be processed.';
+    static defaultError: ApiErrorResponse = {
+        code: 422,
+        name: '422UnprocessableEntity',
+        message: 'Request was understood but not completed because its instructions could not be processed.',
+        isUserSafe: false,
+    };
 
-    constructor(
-        errorType: string = Http422Error.defaultErrorType,
-        errorName: string = Http422Error.defaultName,
-        message: string = Http422Error.defaultDescription,
-        isUserSafe: boolean = true
-    ) {
-        super(
-            Http422Error.defaultStatusCode,
-            errorType,
-            errorName,
-            Http422Error.defaultDescription,
-            message,
-            isUserSafe
-        );
+    constructor(config?: Partial<ApiErrorResponse>) {
+        super(mergeDefaults(Http422Error.defaultError, config));
     }
 
     /**
@@ -267,15 +231,14 @@ export class Http422Error extends HttpError {
      * in the user facing error message.
      * 
      * @param {string} field - Name of the missing field.
-     * @param {boolean} userSafe - Name of the missing field.
+     * @param {boolean} isUserSafe - Does it make sense for end users to see this message?
      */
-    public static withMissingField(field: string, userSafe: boolean = true) {
-        return new Http422Error(
-            '422MissingField',
-            'Missing field',
-            `Request is missing the '${field}' field, please provide a value.`,
-            userSafe
-        );
+    public static withMissingField(field: string, isUserSafe: boolean = false) {
+        return new Http422Error({
+            name: '422MissingField',
+            message: `Request is missing the '${field}' field, please provide a value.`,
+            isUserSafe
+        });
     }
 
     /**
@@ -283,15 +246,14 @@ export class Http422Error extends HttpError {
      * negative number.
      * 
      * @param {string} field - Name of the negative field.
-     * @param {boolean} userSafe - Mark error message as safe to show user.
+     * @param {boolean} isUserSafe - Does it make sense for end users to see this message?
      */
-    public static withNegativeField(field: string, userSafe: boolean = true) {
-        return new Http422Error(
-            '422Negative',
-            'Unexpected negative value',
-            `Value for field '${field}' cannot be a negative number.`,
-            userSafe
-        );
+    public static withNegativeField(field: string, isUserSafe: boolean = true) {
+        return new Http422Error({
+            name: '422Negative',
+            message: `Value for field '${field}' cannot be a negative number.`,
+            isUserSafe
+        });
     }
 
     /**
@@ -299,47 +261,45 @@ export class Http422Error extends HttpError {
      * marked as null but cannot be null in the user facing error message.
      * 
      * @param {string} field - Name of the nulled field.
-     * @param {boolean} userSafe - Mark error message as safe to show user.
+     * @param {boolean} isUserSafe - Does it make sense for end users to see this message?
      */
-    public static withNullField(field: string, userSafe: boolean = true) {
-        return new Http422Error(
-            '422NotNullField',
-            `Unexpected null value`,
-            `Field '${field}' cannot be null, please provide a real value.`,
-            userSafe
-        );
+    public static withNullField(field: string, isUserSafe: boolean = false) {
+        return new Http422Error({
+            name: '422NotNullField',
+            message: `Field '${field}' cannot be null, please provide a real value.`,
+            isUserSafe
+        });
     }
 
     /**
      * Generates a Http422Error with an error message that mentions the name of the field whose 
      * value was not a number, when a number was expected.
      * 
-     * @param {string} field - Name of the nulled field.
-     * @param {boolean} userSafe - Mark error message as safe to show user.
+     * @param {string} field - Name of the NaN field.
+     * @param {any} value - NaN value of the field (used in error message).
+     * @param {boolean} isUserSafe - Does it make sense for end users to see this message?
      */
-    public static withNaNField(field: string, value: any, userSafe: boolean = true) {
-        return new Http422Error(
-            '422NotNumber',
-            'Not a number',
-            `Invalid value for field '${field}', value '${value}' is not a number`,
-            userSafe
-        );
+    public static withNaNField(field: string, value: any, isUserSafe: boolean = true) {
+        return new Http422Error({
+            name: '422NotNullField',
+            message: `Invalid value for field '${field}', value '${value}' is not a number`,
+            isUserSafe
+        });
     }
 
     /**
      * Generates a Http422Error with an error message that mentions the name of the field whose 
-     * value was not a number, when a number was expected.
+     * value was some infinite value.
      * 
-     * @param {string} field - Name of the nulled field.
-     * @param {boolean} userSafe - Mark error message as safe to show user.
+     * @param {string} field - Name of the non finite field.
+     * @param {boolean} isUserSafe - Does it make sense for end users to see this message?
      */
-    public static withNonFiniteField(field: string, userSafe: boolean = true) {
-        return new Http422Error(
-            '422NotFinite',
-            'Non finite value',
-            `Expected field '${field}' to be a finite value.`,
-            userSafe
-        );
+    public static withNonFiniteField(field: string, isUserSafe: boolean = true) {
+        return new Http422Error({
+            name: '422NotFinite',
+            message: `Expected field '${field}' to be a finite value.`,
+            isUserSafe
+        });
     }
 
 }
@@ -352,49 +312,36 @@ export class Http422Error extends HttpError {
  * @extends HttpError
  */
 export class Http500Error extends HttpError {
-    static defaultStatusCode: number = 500;
-    static defaultErrorType: string = '500Internal';
-    static defaultName: string = 'Internal server error';
-    static defaultDescription: string = 'Request was understood but not completed because its instructions could not be processed.';
-    static defaultMessage: string = 'An internal server error took place, please try again later.';
+    static defaultError: ApiErrorResponse = {
+        code: 500,
+        name: '500Internal',
+        message: 'An internal server error took place, please try again later.',
+        isUserSafe: true,
+    };
 
-    native_err: Error;
+    nativeError: Error;
 
-    constructor(error: Error, message = Http500Error.defaultMessage) {
-        super(
-            Http500Error.defaultStatusCode,
-            Http500Error.defaultErrorType,
-            Http500Error.defaultName,
-            Http500Error.defaultDescription,
-            message,
-            true
-        );
-        this.native_err = error;
+    constructor(error: Error, config: Partial<ApiErrorResponse>) {
+        super(mergeDefaults(Http500Error.defaultError, config));
+        this.nativeError = error;
     }
 }
 
 /**
- * ## Http501Error: Internal server error.
- * An internal server error has taken place, this is a last resort for when an error occurs 
- * completely unexpectedly and no more appropriate status code can be found.
+ * ## Http501Error: Not implemented
+ * The server returned an error because the executed code path was not implemented yet.
  * 
  * @extends HttpError
  */
 export class Http501Error extends HttpError {
-    static defaultStatusCode: number = 501;
-    static defaultErrorType: string = '501NotImplemented';
-    static defaultName: string = 'Not implemented';
-    static defaultDescription: string = 'Request was understood but the server does not yet support all the functionality required to fulfill the request.';
-    static defaultMessage: string = 'The requested resource is not yet implemented.';
+    static defaultError: ApiErrorResponse = {
+        code: 501,
+        name: '501NotImplemented',
+        message: 'The requested resource is not yet implemented.',
+        isUserSafe: true,
+    };
 
-    constructor(message = Http501Error.defaultMessage) {
-        super(
-            Http501Error.defaultStatusCode,
-            Http501Error.defaultErrorType,
-            Http501Error.defaultName,
-            Http501Error.defaultDescription,
-            message,
-            true
-        );
+    constructor(config?: Partial<ApiErrorResponse>) {
+        super(mergeDefaults(Http501Error.defaultError, config));
     }
 }
