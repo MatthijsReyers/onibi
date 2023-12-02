@@ -78,7 +78,7 @@ export abstract class HttpError extends Error implements ApiErrorResponse {
 export class Http400Error extends HttpError {
     static defaultError: ApiErrorResponse = {
         code: 400,
-        name: '404BadRequest',
+        name: '400BadRequest',
         message: 'The request could not be processed because it is malformed in some way.',
         isUserSafe: false,
     };

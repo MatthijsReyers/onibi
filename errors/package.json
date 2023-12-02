@@ -1,6 +1,6 @@
 {
   "name": "@onibi/errors",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Standardized error types/responses/handling for express.js based api's and webservers.",
   "main": "lib/index.js",
   "scripts": {
